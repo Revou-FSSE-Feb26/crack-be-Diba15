@@ -1,25 +1,37 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "declaration": true,
-    "removeComments": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    // Penyesuaian Bun
+    "moduleResolution": "Bundler",
+
+    // Pengubahan BaseUrl ke Paths karena typescript 6.0+ akan deprecated
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    // Fitur dekorator untuk class-validator
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2023",
+
+    // Pengaturan output
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
+    "declaration": true,
+    "removeComments": true,
+
+    // Keamanan dan validasi (Strict)
+    "strict": true,
     "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "forceConsistentCasingInFileNames": true,
+
+    // Optimasi kecepatan build
+    "incremental": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
   }
 }
