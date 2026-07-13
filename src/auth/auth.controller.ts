@@ -1,12 +1,12 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
-import type { AuthService } from './auth.service';
-import { GetCurrentUser } from './decorators/get-current-user.decorator';
-import type { LoginDto } from './dto/login.dto';
-import type { RegisterDto } from './dto/register.dto';
-import { JwtAccessGuard } from './guards/jwt-access.guard';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import type { JwtPayload } from './strategies/jwt-access.strategy';
+import { AuthService } from './auth.service.js';
+import { GetCurrentUser } from './decorators/get-current-user.decorator.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { JwtAccessGuard } from './guards/jwt-access.guard.js';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard.js';
+import type { JwtPayload } from './strategies/jwt-access.strategy.js';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,

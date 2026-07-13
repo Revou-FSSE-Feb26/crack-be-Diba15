@@ -4,11 +4,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import type { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import type { PrismaService } from '../prisma/prisma.service';
-import type { LoginDto } from './dto/login.dto';
-import type { RegisterDto } from './dto/register.dto';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { LoginDto } from './dto/login.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +29,7 @@ export class AuthService {
     // Hash password
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    // Buat User + Profile sekaligus (transaction)
+    // Buat User + Profile sekaligus
     const user = await this.prisma.user.create({
       data: {
         name: dto.name,
@@ -92,7 +92,7 @@ export class AuthService {
   // ─── Me ─────────────────────────────────────────────────────────────────────
 
   async getMe(userId: string) {
-    const user = await this.prisma.user.findUnique({
+    return this.prisma.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -115,7 +115,6 @@ export class AuthService {
         },
       },
     });
-    return user;
   }
 
   // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -126,11 +125,11 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
-        expiresIn: process.env.JWT_ACCESS_EXPIRES ?? '15m',
+        expiresIn: (process.env.JWT_ACCESS_EXPIRES ?? '15m') as any,
       }),
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: process.env.JWT_REFRESH_EXPIRES ?? '7d',
+        expiresIn: (process.env.JWT_REFRESH_EXPIRES ?? '7d') as any,
       }),
     ]);
 

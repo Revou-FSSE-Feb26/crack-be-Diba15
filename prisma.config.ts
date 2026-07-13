@@ -7,9 +7,7 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    // Runtime: pakai pooler Supavisor (port 6543) untuk NestJS
-    url: env('DATABASE_URL'),
-    // Migrate: pakai direct connection (port 5432) agar prisma migrate tidak stuck
-    // directUrl: env('DIRECT_URL'),
+    // CLI/Migrate: pakai direct connection (port 5432) agar tidak stuck di pooler Supavisor
+    url: env('DIRECT_URL'),
   },
 });
