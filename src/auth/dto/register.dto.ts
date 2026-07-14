@@ -1,5 +1,13 @@
 import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
-import { Role } from '../../generated/prisma/enums.js';
+
+/**
+ * Role yang diizinkan saat registrasi publik.
+ * Admin dan Curator hanya bisa dibuat oleh admin melalui endpoint khusus.
+ */
+export enum PublicRole {
+  artist = 'artist',
+  client = 'client',
+}
 
 export class RegisterDto {
   @IsString()
@@ -12,6 +20,8 @@ export class RegisterDto {
   @MinLength(8)
   password: string;
 
-  @IsEnum(Role)
-  role: Role;
+  @IsEnum(PublicRole, {
+    message: 'Role hanya boleh "artist" atau "client".',
+  })
+  role: PublicRole;
 }

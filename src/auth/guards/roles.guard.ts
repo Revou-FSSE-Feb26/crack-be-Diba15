@@ -4,7 +4,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import type { Reflector } from '@nestjs/core';
+import { Reflector } from '@nestjs/core';
 import type { Role } from '../../generated/prisma/enums.js';
 import { ROLES_KEY } from '../decorators/roles.decorator.js';
 import type { JwtPayload } from '../strategies/jwt-access.strategy.js';
