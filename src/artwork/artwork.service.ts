@@ -51,7 +51,16 @@ export class ArtworkService {
 
   // ─── Create Artwork ──────────────────────────────────────────────────────────
   async create(artistsId: string, dto: CreateArtworkDto) {
-    const { title, description, imagesUrl, wipProofUrl, uploadType, tagNames } = dto;
+    const {
+      title,
+      description,
+      imagesUrl,
+      wipProofUrl,
+      uploadType,
+      tagNames,
+      curationStatus,
+      isVisibleOnFeed,
+    } = dto;
 
     // Pastikan user adalah artist dan tidak diblokir
     const profile = await this.prisma.profile.findUnique({
@@ -78,8 +87,8 @@ export class ArtworkService {
           imagesUrl,
           wipProofUrl: wipProofUrl || null,
           uploadType,
-          curationStatus: 'pending', // Default saat artist buat baru
-          isVisibleOnFeed: false, // Menunggu kurasi
+          curationStatus: (curationStatus as any) || 'pending',
+          isVisibleOnFeed: isVisibleOnFeed !== undefined ? isVisibleOnFeed : false,
         },
       });
 
@@ -483,5 +492,77 @@ export class ArtworkService {
     }
 
     return popularTags;
+  }
+
+  // ─── Get All Artists ───────────────────────────────────────────────────────
+  async findAllArtists() {
+    const artists = await this.prisma.user.findMany({
+      where: { role: 'artist' },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        profile: {
+          select: {
+            avatarUrl: true,
+            bio: true,
+            isVerified: true,
+            isOpenForCommission: true,
+            basePriceIdr: true,
+            approvedPortfolioCount: true,
+          },
+        },
+        _count: {
+          select: {
+            followers: true,
+          },
+        },
+      },
+    });
+
+    const mapped = artists.map((a) => {
+      return {
+        id: a.id,
+        user_id: a.id,
+        avatar_url: a.profile?.avatarUrl || '',
+        bio: a.profile?.bio || '',
+        is_verified: a.profile?.isVerified || false,
+        is_open_for_commission: a.profile?.isOpenForCommission || false,
+        base_price_idr: a.profile?.basePriceIdr || null,
+        approved_portfolio_count: a.profile?.approvedPortfolioCount || 0,
+        followersCount: a._count.followers || 0,
+        user: {
+          id: a.id,
+          name: a.name,
+          role: a.role,
+        },
+      };
+    });
+
+    // Sort by followers count DESC, then by approved portfolio count DESC
+    return mapped.sort((a, b) => {
+      if (b.followersCount !== a.followersCount) {
+        return b.followersCount - a.followersCount;
+      }
+      return b.approved_portfolio_count - a.approved_portfolio_count;
+    });
+  }
+
+  // ─── Get Popular Artists ───────────────────────────────────────────────────
+  async findPopularArtists() {
+    const all = await this.findAllArtists();
+    return all.slice(0, 3);
+  }
+
+  // ─── Get All Tags ──────────────────────────────────────────────────────────
+  async findAllTags() {
+    const tags = await this.prisma.tag.findMany({
+      orderBy: { tagName: 'asc' },
+    });
+    return tags.map((t) => ({
+      id: t.id,
+      tag_name: t.tagName,
+    }));
   }
 }

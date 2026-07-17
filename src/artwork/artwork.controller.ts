@@ -47,6 +47,21 @@ export class ArtworkController {
     return this.artworkService.getPopularTags();
   }
 
+  @Get('artists/popular')
+  findPopularArtists() {
+    return this.artworkService.findPopularArtists();
+  }
+
+  @Get('artists')
+  findAllArtists() {
+    return this.artworkService.findAllArtists();
+  }
+
+  @Get('tags')
+  findAllTags() {
+    return this.artworkService.findAllTags();
+  }
+
   // ─── Curator & Admin Routes (Terproteksi Guard & Role) ───────────────────────
 
   @Get('pending')

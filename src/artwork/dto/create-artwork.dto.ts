@@ -25,4 +25,11 @@ export class CreateArtworkDto {
   @IsArray({ message: 'tagNames harus berupa array dari string.' })
   @IsString({ each: true, message: 'Setiap nama tag harus berupa string.' })
   tagNames?: string[];
+
+  @IsOptional()
+  @IsString()
+  curationStatus?: string;
+
+  @IsOptional()
+  isVisibleOnFeed?: boolean;
 }
