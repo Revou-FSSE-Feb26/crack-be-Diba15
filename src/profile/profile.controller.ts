@@ -10,10 +10,7 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Patch()
-  update(
-    @GetCurrentUser('sub') userId: string,
-    @Body() dto: UpdateProfileDto,
-  ) {
+  update(@GetCurrentUser('sub') userId: string, @Body() dto: UpdateProfileDto) {
     return this.profileService.update(userId, dto);
   }
 }

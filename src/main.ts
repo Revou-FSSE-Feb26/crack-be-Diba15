@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
+import { PrismaClientExceptionFilter } from './prisma/prisma-client-exception.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,10 @@ async function bootstrap() {
       transform: true, // Auto-transform type (string → number, dll)
     }),
   );
+
+  // Prisma Exception Filter global
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

@@ -10,4 +10,3 @@ import { UserService } from './user.service.js';
   exports: [UserService],
 })
 export class UserModule {}
-

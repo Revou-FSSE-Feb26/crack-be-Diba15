@@ -62,10 +62,7 @@ export class UserController {
    * Lihat detail user. User bisa lihat profil diri sendiri, admin bisa lihat siapapun.
    */
   @Get(':id')
-  findOne(
-    @Param('id') id: string,
-    @GetCurrentUser() requester: JwtPayload,
-  ) {
+  findOne(@Param('id') id: string, @GetCurrentUser() requester: JwtPayload) {
     const isSelf = requester.sub === id;
     const isAdmin = requester.role === 'admin';
 
