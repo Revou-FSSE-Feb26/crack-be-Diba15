@@ -57,6 +57,11 @@ export class ArtworkController {
     return this.artworkService.findAllArtists();
   }
 
+  @Get('artists/:id')
+  findArtistById(@Param('id') id: string) {
+    return this.artworkService.findArtistById(id);
+  }
+
   @Get('tags')
   findAllTags() {
     return this.artworkService.findAllTags();

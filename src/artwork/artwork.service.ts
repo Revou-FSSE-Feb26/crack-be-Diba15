@@ -38,6 +38,7 @@ export class ArtworkService {
         ? {
             is_verified: artwork.artist.profile.isVerified,
             is_open_for_commission: artwork.artist.profile.isOpenForCommission,
+            avatar_url: artwork.artist.profile.avatarUrl || null,
           }
         : undefined,
       tags: artwork.tags
@@ -127,6 +128,7 @@ export class ArtworkService {
                 select: {
                   isVerified: true,
                   isOpenForCommission: true,
+                  avatarUrl: true,
                 },
               },
             },
@@ -204,6 +206,7 @@ export class ArtworkService {
               select: {
                 isVerified: true,
                 isOpenForCommission: true,
+                avatarUrl: true,
               },
             },
           },
@@ -232,6 +235,7 @@ export class ArtworkService {
               select: {
                 isVerified: true,
                 isOpenForCommission: true,
+                avatarUrl: true,
               },
             },
           },
@@ -325,6 +329,7 @@ export class ArtworkService {
                 select: {
                   isVerified: true,
                   isOpenForCommission: true,
+                  avatarUrl: true,
                 },
               },
             },
@@ -398,6 +403,7 @@ export class ArtworkService {
                 select: {
                   isVerified: true,
                   isOpenForCommission: true,
+                  avatarUrl: true,
                 },
               },
             },
@@ -564,5 +570,56 @@ export class ArtworkService {
       id: t.id,
       tag_name: t.tagName,
     }));
+  }
+
+  // ─── Get Single Artist by ID (Public) ──────────────────────────────────────
+  async findArtistById(id: string) {
+    const artist = await this.prisma.user.findFirst({
+      where: { id, role: 'artist' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        profile: {
+          select: {
+            avatarUrl: true,
+            bio: true,
+            isVerified: true,
+            isOpenForCommission: true,
+            basePriceIdr: true,
+            approvedPortfolioCount: true,
+          },
+        },
+        _count: {
+          select: {
+            followers: true,
+          },
+        },
+      },
+    });
+
+    if (!artist) {
+      throw new NotFoundException('Artis tidak ditemukan.');
+    }
+
+    return {
+      id: artist.id,
+      user_id: artist.id,
+      avatar_url: artist.profile?.avatarUrl || '',
+      bio: artist.profile?.bio || '',
+      is_verified: artist.profile?.isVerified || false,
+      is_open_for_commission: artist.profile?.isOpenForCommission || false,
+      base_price_idr: artist.profile?.basePriceIdr || null,
+      approved_portfolio_count: artist.profile?.approvedPortfolioCount || 0,
+      followersCount: artist._count.followers || 0,
+      user: {
+        id: artist.id,
+        name: artist.name,
+        email: artist.email,
+        role: artist.role,
+      },
+    };
   }
 }
