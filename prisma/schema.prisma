@@ -83,18 +83,18 @@ enum DisputeStatus {
 // =============================================================================
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String
-  role         Role     @default(client)
-  balance      Float    @default(0) @map("balance")
-  refreshToken String?  @map("refresh_token")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(client)
+  balance   Float    @default(0) @map("balance")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   profile             Profile?
+  sessions            Session[]
   artworks            Artwork[]
   clientCommissions   Commission[]      @relation("ClientCommissions")
   artistCommissions   Commission[]      @relation("ArtistCommissions")
@@ -106,6 +106,7 @@ model User {
   favorites           Favorite[]
   following           Follow[]          @relation("Follower")
   followers           Follow[]          @relation("FollowedArtist")
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -125,6 +126,19 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @map("refresh_token")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 // =============================================================================
@@ -299,4 +313,16 @@ model Follow {
 
   @@unique([followerId, artistId])
   @@map("follows")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
 }
