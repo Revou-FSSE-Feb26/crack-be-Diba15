@@ -13,7 +13,7 @@ import { UpdateArtworkDto } from './dto/update-artwork.dto.js';
 export class ArtworkService {
   constructor(private readonly artworkRepository: ArtworkRepository) {}
 
-  private mapToFrontendArtwork(artwork: any) {
+  mapToFrontendArtwork(artwork: any) {
     if (!artwork) return null;
     return {
       id: artwork.id,
