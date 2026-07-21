@@ -5,7 +5,7 @@ import { ProfileRepository } from '../profile/profile.repository.js';
 export class UploadService {
   constructor(private readonly profileRepository: ProfileRepository) {}
 
-  async handleAvatarUpload(userId: string, file: any): Promise<{ url: string }> {
+  async handleAvatarUpload(userId: string, file: Express.Multer.File): Promise<{ url: string }> {
     // 1. Dapatkan profil saat ini untuk memeriksa jika sudah ada avatar sebelumnya
     const profile = await this.profileRepository.findByUserId(userId);
 
@@ -29,7 +29,11 @@ export class UploadService {
     return { url };
   }
 
-  async uploadFile(file: any, folder: string, customFilename?: string): Promise<string> {
+  async uploadFile(
+    file: Express.Multer.File,
+    folder: string,
+    customFilename?: string,
+  ): Promise<string> {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_KEY;
     const supabaseBucket = process.env.SUPABASE_BUCKET;
@@ -54,7 +58,7 @@ export class UploadService {
           Authorization: `Bearer ${supabaseKey}`,
           'Content-Type': file.mimetype,
         },
-        body: file.buffer,
+        body: new Uint8Array(file.buffer),
       });
 
       if (!response.ok) {

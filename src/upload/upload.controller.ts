@@ -21,7 +21,10 @@ export class UploadController {
   // ─── Single File Upload (POST /api/upload) — KHUSUS AVATAR ──────────────────
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  async uploadAvatar(@UploadedFile() file: any, @GetCurrentUser('sub') userId: string) {
+  async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @GetCurrentUser('sub') userId: string,
+  ) {
     if (!file) {
       throw new BadRequestException('File avatar wajib diunggah.');
     }
@@ -46,7 +49,10 @@ export class UploadController {
   // ─── Multiple Files Upload (POST /api/upload/bulk) — ARTWORKS & WIPS ────────
   @Post('bulk')
   @UseInterceptors(FilesInterceptor('files', 5))
-  async uploadMultiple(@UploadedFiles() files: any[], @Query('folder') folder = 'artworks') {
+  async uploadMultiple(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Query('folder') folder = 'artworks',
+  ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('Minimal satu file wajib diunggah.');
     }
