@@ -39,7 +39,7 @@ export class MailService {
         <body>
           <div class="card">
             <div class="header">
-              <div class="logo">🎨 TruBrush</div>
+              <div class="logo">TruBrush</div>
             </div>
             <p>Halo <strong>${name}</strong>,</p>
             <p>Kami menerima permintaan untuk mereset password akun TruBrush Anda. Klik tombol di bawah ini untuk membuat password baru:</p>
