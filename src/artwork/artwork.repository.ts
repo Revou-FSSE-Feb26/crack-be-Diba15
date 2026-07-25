@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service.js';
-import type { CreateArtworkDto } from './dto/create-artwork.dto.js';
-import type { CurateArtworkDto } from './dto/curate-artwork.dto.js';
-import type { UpdateArtworkDto } from './dto/update-artwork.dto.js';
+import { PrismaService } from '../prisma/prisma.service';
+import type { CreateArtworkDto } from './dto/create-artwork.dto';
+import type { CurateArtworkDto } from './dto/curate-artwork.dto';
+import type { UpdateArtworkDto } from './dto/update-artwork.dto';
 
 const artworkWithRelationsSelect = {
   include: {

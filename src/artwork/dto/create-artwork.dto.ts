@@ -1,5 +1,5 @@
 import { IsArray, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
-import { UploadType } from '../../generated/prisma/enums.js';
+import { UploadType } from '../../generated/prisma/enums';
 
 export class CreateArtworkDto {
   @IsString()

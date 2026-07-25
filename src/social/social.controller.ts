@@ -1,7 +1,7 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
-import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator.js';
-import { JwtAccessGuard } from '../auth/guards/jwt-access.guard.js';
-import { SocialService } from './social.service.js';
+import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
+import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
+import { SocialService } from './social.service';
 
 @Controller('social')
 @UseGuards(JwtAccessGuard)

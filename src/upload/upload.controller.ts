@@ -9,9 +9,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator.js';
-import { JwtAccessGuard } from '../auth/guards/jwt-access.guard.js';
-import { UploadService } from './upload.service.js';
+import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
+import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
+import { UploadService } from './upload.service';
 
 @Controller('upload')
 @UseGuards(JwtAccessGuard)

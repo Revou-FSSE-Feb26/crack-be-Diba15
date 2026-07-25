@@ -1,6 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../src/generated/prisma/client';
 import * as bcrypt from 'bcrypt';
-import { PrismaClient } from '../src/generated/prisma/client.js';
 
 // Inisialisasi Prisma Client menggunakan adapter pg (sama seperti PrismaService)
 const adapter = new PrismaPg({

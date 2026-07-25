@@ -2,8 +2,8 @@ import 'dotenv/config';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
-import { AppModule } from './app.module.js';
-import { PrismaClientExceptionFilter } from './prisma/prisma-client-exception.filter.js';
+import { AppModule } from './app.module';
+import { PrismaClientExceptionFilter } from './prisma/prisma-client-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

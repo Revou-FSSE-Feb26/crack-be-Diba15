@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ProfileRepository } from '../profile/profile.repository.js';
+import { ProfileRepository } from '../profile/profile.repository';
 
 @Injectable()
 export class UploadService {

@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { CurationStatus } from '../../generated/prisma/enums.js';
+import { CurationStatus } from '../../generated/prisma/enums';
 
 export class CurateArtworkDto {
   @IsEnum(CurationStatus, { message: 'Status kurasi tidak valid.' })

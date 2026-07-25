@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ArtworkService } from '../artwork/artwork.service.js';
-import { UserRepository } from '../user/user.repository.js';
-import { FavoriteRepository } from './favorite.repository.js';
-import { FollowRepository } from './follow.repository.js';
+import { ArtworkService } from '../artwork/artwork.service';
+import { UserRepository } from '../user/user.repository';
+import { FavoriteRepository } from './favorite.repository';
+import { FollowRepository } from './follow.repository';
 
 @Injectable()
 export class SocialService {

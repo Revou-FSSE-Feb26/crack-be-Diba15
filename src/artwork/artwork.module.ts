@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module.js';
-import { ArtworkController } from './artwork.controller.js';
-import { ArtworkRepository } from './artwork.repository.js';
-import { ArtworkService } from './artwork.service.js';
+import { PrismaModule } from '../prisma/prisma.module';
+import { ArtworkController } from './artwork.controller';
+import { ArtworkRepository } from './artwork.repository';
+import { ArtworkService } from './artwork.service';
 
 @Module({
   imports: [PrismaModule],

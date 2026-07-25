@@ -4,10 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ArtworkRepository } from './artwork.repository.js';
-import { CreateArtworkDto } from './dto/create-artwork.dto.js';
-import { CurateArtworkDto } from './dto/curate-artwork.dto.js';
-import { UpdateArtworkDto } from './dto/update-artwork.dto.js';
+import { ArtworkRepository } from './artwork.repository';
+import { CreateArtworkDto } from './dto/create-artwork.dto';
+import { CurateArtworkDto } from './dto/curate-artwork.dto';
+import { UpdateArtworkDto } from './dto/update-artwork.dto';
 
 @Injectable()
 export class ArtworkService {

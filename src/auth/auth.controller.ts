@@ -11,15 +11,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { AuthService } from './auth.service.js';
-import { GetCurrentUser } from './decorators/get-current-user.decorator.js';
-import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
-import { LoginDto } from './dto/login.dto.js';
-import { RegisterDto } from './dto/register.dto.js';
-import { ResetPasswordDto } from './dto/reset-password.dto.js';
-import { JwtAccessGuard } from './guards/jwt-access.guard.js';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard.js';
-import type { JwtPayload } from './strategies/jwt-access.strategy.js';
+import { AuthService } from './auth.service';
+import { GetCurrentUser } from './decorators/get-current-user.decorator';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtAccessGuard } from './guards/jwt-access.guard';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import type { JwtPayload } from './strategies/jwt-access.strategy';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,

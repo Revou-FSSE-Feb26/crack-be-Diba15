@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { MailModule } from '../mail/mail.module.js';
-import { SessionModule } from '../session/session.module.js';
-import { UserModule } from '../user/user.module.js';
-import { AuthController } from './auth.controller.js';
-import { AuthService } from './auth.service.js';
-import { PasswordResetRepository } from './password-reset.repository.js';
-import { JwtAccessStrategy } from './strategies/jwt-access.strategy.js';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy.js';
+import { MailModule } from '../mail/mail.module';
+import { SessionModule } from '../session/session.module';
+import { UserModule } from '../user/user.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { PasswordResetRepository } from './password-reset.repository';
+import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [

@@ -9,14 +9,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator.js';
-import { Roles } from '../auth/decorators/roles.decorator.js';
-import { JwtAccessGuard } from '../auth/guards/jwt-access.guard.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
-import type { JwtPayload } from '../auth/strategies/jwt-access.strategy.js';
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UpdateUserDto } from './dto/update-user.dto.js';
-import { UserService } from './user.service.js';
+import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import type { JwtPayload } from '../auth/strategies/jwt-access.strategy';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserService } from './user.service';
 
 @Controller('user')
 @UseGuards(JwtAccessGuard, RolesGuard)

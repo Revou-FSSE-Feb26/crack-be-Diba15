@@ -9,15 +9,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import type { StringValue } from 'ms';
-import { Role } from '../generated/prisma/enums.js';
-import { MailService } from '../mail/mail.service.js';
-import { SessionRepository } from '../session/session.repository.js';
-import { UserRepository } from '../user/user.repository.js';
-import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
-import { LoginDto } from './dto/login.dto.js';
-import { RegisterDto } from './dto/register.dto.js';
-import { ResetPasswordDto } from './dto/reset-password.dto.js';
-import { PasswordResetRepository } from './password-reset.repository.js';
+import { Role } from '../generated/prisma/enums';
+import { MailService } from '../mail/mail.service';
+import { SessionRepository } from '../session/session.repository';
+import { UserRepository } from '../user/user.repository';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { PasswordResetRepository } from './password-reset.repository';
 
 @Injectable()
 export class AuthService {

@@ -9,15 +9,15 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator.js';
-import { Roles } from '../auth/decorators/roles.decorator.js';
-import { JwtAccessGuard } from '../auth/guards/jwt-access.guard.js';
-import { RolesGuard } from '../auth/guards/roles.guard.js';
-import type { JwtPayload } from '../auth/strategies/jwt-access.strategy.js';
-import { ArtworkService } from './artwork.service.js';
-import { CreateArtworkDto } from './dto/create-artwork.dto.js';
-import { CurateArtworkDto } from './dto/curate-artwork.dto.js';
-import { UpdateArtworkDto } from './dto/update-artwork.dto.js';
+import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import type { JwtPayload } from '../auth/strategies/jwt-access.strategy';
+import { ArtworkService } from './artwork.service';
+import { CreateArtworkDto } from './dto/create-artwork.dto';
+import { CurateArtworkDto } from './dto/curate-artwork.dto';
+import { UpdateArtworkDto } from './dto/update-artwork.dto';
 
 @Controller('artwork')
 export class ArtworkController {

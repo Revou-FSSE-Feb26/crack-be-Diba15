@@ -4,10 +4,11 @@
 // =============================================================================
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-  runtimeTarget = "node"
-  moduleFormat = "esm"
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  generatedFileExtension = "ts"
+  importFileExtension    = ""
+  moduleFormat           = "cjs"
 }
 
 datasource db {
