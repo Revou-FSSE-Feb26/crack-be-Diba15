@@ -10,6 +10,22 @@ export class UpdateProfileDto {
   avatarUrl?: string;
 
   @IsOptional()
+  @IsString()
+  instagramUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  twitterUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  pixivUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  websiteUrl?: string;
+
+  @IsOptional()
   @IsBoolean()
   isOpenForCommission?: boolean;
 

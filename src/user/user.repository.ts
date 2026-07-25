@@ -42,6 +42,10 @@ export class UserRepository {
           select: {
             avatarUrl: true,
             bio: true,
+            instagramUrl: true,
+            twitterUrl: true,
+            pixivUrl: true,
+            websiteUrl: true,
             isVerified: true,
           },
         },
@@ -64,6 +68,10 @@ export class UserRepository {
           select: {
             avatarUrl: true,
             bio: true,
+            instagramUrl: true,
+            twitterUrl: true,
+            pixivUrl: true,
+            websiteUrl: true,
             isVerified: true,
             isOpenForCommission: true,
             basePriceIdr: true,

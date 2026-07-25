@@ -321,6 +321,10 @@ export class ArtworkRepository {
           select: {
             avatarUrl: true,
             bio: true,
+            instagramUrl: true,
+            twitterUrl: true,
+            pixivUrl: true,
+            websiteUrl: true,
             isVerified: true,
             isOpenForCommission: true,
             basePriceIdr: true,
@@ -355,6 +359,10 @@ export class ArtworkRepository {
           select: {
             avatarUrl: true,
             bio: true,
+            instagramUrl: true,
+            twitterUrl: true,
+            pixivUrl: true,
+            websiteUrl: true,
             isVerified: true,
             isOpenForCommission: true,
             basePriceIdr: true,

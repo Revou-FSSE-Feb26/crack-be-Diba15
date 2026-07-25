@@ -117,6 +117,10 @@ model Profile {
   userId                 String   @unique @map("user_id")
   avatarUrl              String?  @map("avatar_url")
   bio                    String?
+  instagramUrl           String?  @map("instagram_url")
+  twitterUrl             String?  @map("twitter_url")
+  pixivUrl               String?  @map("pixiv_url")
+  websiteUrl             String?  @map("website_url")
   isVerified             Boolean  @default(false) @map("is_verified")
   approvedPortfolioCount Int      @default(0) @map("approved_portfolio_count")
   isOpenForCommission    Boolean  @default(false) @map("is_open_for_commission")
