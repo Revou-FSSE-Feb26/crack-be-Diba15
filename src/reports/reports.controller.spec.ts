@@ -74,8 +74,8 @@ describe('ReportsController', () => {
       expect(service.resolve).toHaveBeenCalledWith('rep-001', 'u-008', {
         status: 'resolved',
       });
-      expect(result.status).toBe('resolved');
-      expect(result.curator_id).toBe('u-008');
+      expect(result?.status).toBe('resolved');
+      expect(result?.curator_id).toBe('u-008');
     });
   });
 });

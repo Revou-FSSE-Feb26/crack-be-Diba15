@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ArtworksModule } from './artworks/artworks.module';
 import { AuthModule } from './auth/auth.module';
+import { CommissionsModule } from './commissions/commissions.module';
+import { DisputesModule } from './disputes/disputes.module';
 import { MailModule } from './mail/mail.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfilesModule } from './profiles/profiles.module';
@@ -22,6 +24,8 @@ import { UsersModule } from './users/users.module';
     MailModule,
     SocialModule,
     ReportsModule,
+    CommissionsModule,
+    DisputesModule,
   ],
 })
 export class AppModule {}
