@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma, Role } from '../generated/prisma/client';
+import { Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -87,6 +87,31 @@ export class UserRepository {
     return this.prisma.user.update({
       where: { id },
       data,
+    });
+  }
+
+  async getBalance(id: string) {
+    return await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, balance: true },
+    });
+  }
+
+  async topUp(id: string, amount: number) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        balance: {
+          increment: amount,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        balance: true,
+      },
     });
   }
 

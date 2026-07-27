@@ -15,6 +15,7 @@ import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import type { JwtPayload } from '../auth/strategies/jwt-access.strategy';
 import { CreateUserDto } from './dto/create-user.dto';
+import { TopUpDto } from './dto/topup.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
@@ -22,6 +23,26 @@ import { UserService } from './user.service';
 @UseGuards(JwtAccessGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  // ─── Balance & Wallet Operations (Self) ────────────────────────────────────
+
+  /**
+   * GET /api/user/balance
+   * Lihat sisa saldo pengguna yang sedang login.
+   */
+  @Get('balance')
+  getBalance(@GetCurrentUser('sub') userId: string) {
+    return this.userService.getBalance(userId);
+  }
+
+  /**
+   * POST /api/user/topup
+   * Top-up saldo pengguna yang sedang login.
+   */
+  @Post('topup')
+  topUp(@GetCurrentUser('sub') userId: string, @Body() dto: TopUpDto) {
+    return this.userService.topUp(userId, dto);
+  }
 
   // ─── Admin Only ──────────────────────────────────────────────────────────────
 

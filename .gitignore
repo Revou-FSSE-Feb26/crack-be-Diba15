@@ -51,4 +51,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .DS_Store
 Thumbs.db
 
+# Prisma generated files
 /src/generated
+
+# Agents Folder
+.agents/

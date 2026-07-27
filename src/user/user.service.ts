@@ -1,6 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
+import { TopUpDto } from './dto/topup.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './user.repository';
 
@@ -57,6 +63,34 @@ export class UserService {
 
     const { password, ...result } = user;
     return result;
+  }
+
+  async getBalance(userId: string) {
+    const user = await this.userRepository.getBalance(userId);
+    if (!user) {
+      throw new NotFoundException('User tidak ditemukan.');
+    }
+    return {
+      userId: user.id,
+      balance: user.balance,
+    };
+  }
+
+  async topUp(userId: string, dto: TopUpDto) {
+    if (!dto.amount || dto.amount <= 0) {
+      throw new BadRequestException('Nominal top-up harus lebih dari 0.');
+    }
+
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User tidak ditemukan.');
+    }
+
+    const updated = await this.userRepository.topUp(userId, dto.amount);
+    return {
+      message: 'Top-up saldo berhasil.',
+      user: updated,
+    };
   }
 
   async remove(id: string) {
