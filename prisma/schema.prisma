@@ -1,0 +1,333 @@
+// =============================================================================
+// TruBrush — Prisma Schema
+// Database: Supabase PostgreSQL
+// =============================================================================
+
+generator client {
+  provider               = "prisma-client"
+  output                 = "../src/generated/prisma"
+  generatedFileExtension = "ts"
+  importFileExtension    = ""
+  moduleFormat           = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum Role {
+  artist
+  client
+  admin
+  curator
+}
+
+enum UploadType {
+  original
+  fanart
+  commission
+}
+
+enum CurationStatus {
+  unapproved
+  pending
+  approved
+  rejected
+  flagged
+}
+
+enum CommissionStatus {
+  pending
+  accepted
+  in_progress
+  revision
+  completed
+  cancelled
+  disputed
+}
+
+enum PaymentStatus {
+  unpaid
+  paid
+  refunded
+  released
+}
+
+enum PaymentMethod {
+  wallet
+  credit_card
+}
+
+enum ReportTargetType {
+  artwork
+  profile
+}
+
+enum ReportStatus {
+  pending
+  resolved
+  dismissed
+}
+
+enum DisputeStatus {
+  pending
+  approved
+  rejected
+}
+
+// =============================================================================
+// USER & PROFILE
+// =============================================================================
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(client)
+  balance   Float    @default(0) @map("balance")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  profile             Profile?
+  sessions            Session[]
+  artworks            Artwork[]
+  clientCommissions   Commission[]      @relation("ClientCommissions")
+  artistCommissions   Commission[]      @relation("ArtistCommissions")
+  revisions           Revision[]
+  disputesMediating   DisputeLog[]      @relation("DisputeMediator")
+  reportsSubmitted    Report[]          @relation("Reporter")
+  reportsCurating     Report[]          @relation("ReportCurator")
+  artworksReviewed    Artwork[]         @relation("ArtworkReviewer")
+  favorites           Favorite[]
+  following           Follow[]          @relation("Follower")
+  followers           Follow[]          @relation("FollowedArtist")
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique @map("user_id")
+  avatarUrl              String?  @map("avatar_url")
+  bio                    String?
+  instagramUrl           String?  @map("instagram_url")
+  twitterUrl             String?  @map("twitter_url")
+  pixivUrl               String?  @map("pixiv_url")
+  websiteUrl             String?  @map("website_url")
+  isVerified             Boolean  @default(false) @map("is_verified")
+  approvedPortfolioCount Int      @default(0) @map("approved_portfolio_count")
+  isOpenForCommission    Boolean  @default(false) @map("is_open_for_commission")
+  basePriceIdr           Int?     @map("base_price_idr")
+  strikeCount            Int      @default(0) @map("strike_count")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @map("refresh_token")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// =============================================================================
+// ARTWORK & TAG
+// =============================================================================
+
+model Artwork {
+  id               String         @id @default(uuid())
+  artistsId        String         @map("artists_id")
+  title            String
+  description      String?
+  imagesUrl        String[]       @map("images_url")
+  wipProofUrl      String?        @map("wip_proof_url")
+  uploadType       UploadType     @default(original) @map("upload_type")
+  curationStatus   CurationStatus @default(unapproved) @map("curation_status")
+  isVisibleOnFeed  Boolean        @default(false) @map("is_visible_on_feed")
+  rejectionReason  String?        @map("rejection_reason")
+  reviewedBy       String?        @map("reviewed_by")
+  reviewedAt       DateTime?      @map("reviewed_at")
+  createdAt        DateTime       @default(now()) @map("created_at")
+
+  // Relations
+  artist    User         @relation(fields: [artistsId], references: [id], onDelete: Cascade)
+  reviewer  User?        @relation("ArtworkReviewer", fields: [reviewedBy], references: [id])
+  tags      ArtworkTag[]
+  favorites Favorite[]
+  reports   Report[]
+
+  @@map("artworks")
+}
+
+model Tag {
+  id      String       @id @default(uuid())
+  tagName String       @unique @map("tag_name")
+
+  artworks ArtworkTag[]
+
+  @@map("tags")
+}
+
+model ArtworkTag {
+  artworkId String @map("artwork_id")
+  tagId     String @map("tag_id")
+
+  artwork Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([artworkId, tagId])
+  @@map("artwork_tags")
+}
+
+// =============================================================================
+// COMMISSION FLOW
+// =============================================================================
+
+model Commission {
+  id              String           @id @default(uuid())
+  artistsId       String           @map("artists_id")
+  clientId        String           @map("client_id")
+  commissionTitle String           @map("commission_title")
+  description     String?
+  price           Int
+  status          CommissionStatus @default(pending)
+  paymentStatus   PaymentStatus    @default(unpaid) @map("payment_status")
+  paymentMethod   PaymentMethod?   @map("payment_method")
+  cardLastFour    String?          @map("card_last_four")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  artist    User                 @relation("ArtistCommissions", fields: [artistsId], references: [id])
+  client    User                 @relation("ClientCommissions", fields: [clientId], references: [id])
+  progress  CommissionProgress?
+  revisions Revision[]
+  dispute   DisputeLog?
+
+  @@map("commissions")
+}
+
+model CommissionProgress {
+  id                   String   @id @default(uuid())
+  commissionId         String   @unique @map("commission_id")
+  sketchUrl            String?  @map("sketch_url")
+  sketchApproved       Boolean  @default(false) @map("sketch_approved")
+  finalArtworkUrl      String?  @map("final_artwork_url")
+  finalArtworkApproved Boolean  @default(false) @map("final_artwork_approved")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  commission Commission @relation(fields: [commissionId], references: [id], onDelete: Cascade)
+
+  @@map("commission_progress")
+}
+
+model Revision {
+  id           String   @id @default(uuid())
+  commissionId String   @map("commission_id")
+  userId       String   @map("user_id")
+  comment      String
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  commission Commission @relation(fields: [commissionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@map("revisions")
+}
+
+// =============================================================================
+// DISPUTE
+// =============================================================================
+
+model DisputeLog {
+  id           String        @id @default(uuid())
+  commissionId String        @unique @map("commission_id")
+  reason       String
+  status       DisputeStatus @default(pending)
+  mediatorId   String?       @map("mediator_id")
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  commission Commission @relation(fields: [commissionId], references: [id], onDelete: Cascade)
+  mediator   User?      @relation("DisputeMediator", fields: [mediatorId], references: [id])
+
+  @@map("dispute_logs")
+}
+
+// =============================================================================
+// REPORT
+// =============================================================================
+
+model Report {
+  id           String           @id @default(uuid())
+  reporterId   String           @map("reporter_id")
+  targetType   ReportTargetType @map("target_type")
+  targetId     String           @map("target_id")
+  reason       String
+  status       ReportStatus     @default(pending)
+  curatorId    String?          @map("curator_id")
+  artworkId    String?          @map("artwork_id")
+  createdAt    DateTime         @default(now()) @map("created_at")
+
+  reporter User     @relation("Reporter", fields: [reporterId], references: [id])
+  curator  User?    @relation("ReportCurator", fields: [curatorId], references: [id])
+  artwork  Artwork? @relation(fields: [artworkId], references: [id])
+
+  @@map("reports")
+}
+
+// =============================================================================
+// SOCIAL: FAVORITE & FOLLOW
+// =============================================================================
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  artworkId String   @map("artwork_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artwork Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, artworkId])
+  @@map("favorites")
+}
+
+model Follow {
+  id         String   @id @default(uuid())
+  followerId String   @map("follower_id")
+  artistId   String   @map("artist_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  follower User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  artist   User @relation("FollowedArtist", fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, artistId])
+  @@map("follows")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
