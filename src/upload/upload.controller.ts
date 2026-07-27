@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Controller,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -105,5 +106,76 @@ export class UploadController {
     }
 
     return { urls };
+  }
+
+  // ─── Commission Uploads ───────────────────────────────────────────────────
+
+  /**
+   * POST /api/upload/commissions/:commissionId/wip
+   * Bulk upload bukti pengerjaan (wip) ke folder `commissions/:commissionId/wip`.
+   */
+  @Post('commissions/:commissionId/wip')
+  @UseInterceptors(FilesInterceptor('files', 5))
+  async uploadCommissionWip(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Param('commissionId') commissionId: string,
+  ) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Minimal satu file WIP wajib diunggah.');
+    }
+
+    if (files.length > 5) {
+      throw new BadRequestException('Maksimal pengunggahan adalah 5 file WIP.');
+    }
+
+    return this.uploadService.handleCommissionWipUpload(commissionId, files);
+  }
+
+  /**
+   * POST /api/upload/commissions/:commissionId/preview
+   * Upload sketsa / preview komisi ke folder `commissions/:commissionId/preview`.
+   */
+  @Post('commissions/:commissionId/preview')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCommissionPreview(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('commissionId') commissionId: string,
+  ) {
+    if (!file) {
+      throw new BadRequestException('File preview/sketsa wajib diunggah.');
+    }
+
+    const maxImageSize = 15 * 1024 * 1024;
+    if (file.size > maxImageSize) {
+      throw new BadRequestException('Ukuran file preview maksimal 15MB.');
+    }
+
+    return this.uploadService.handleCommissionPreviewUpload(commissionId, file);
+  }
+
+  /**
+   * POST /api/upload/commissions/:commissionId/final
+   * Upload berkas hasil akhir komisi (gambar, zip, rar, pdf, psd) ke folder `commissions/:commissionId/final`.
+   */
+  @Post('commissions/:commissionId/final')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCommissionFinal(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('commissionId') commissionId: string,
+  ) {
+    if (!file) {
+      throw new BadRequestException('File hasil akhir komisi wajib diunggah.');
+    }
+
+    // Maksimal ukuran 100MB untuk hasil akhir
+    const maxFinalSize = 100 * 1024 * 1024;
+    if (file.size > maxFinalSize) {
+      throw new BadRequestException('Ukuran file hasil akhir maksimal 100MB.');
+    }
+
+    const folderPath = `commissions/${commissionId}/final`;
+    const url = await this.uploadService.uploadFile(file, folderPath);
+
+    return { url };
   }
 }

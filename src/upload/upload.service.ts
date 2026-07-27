@@ -1,9 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { ProfilesRepository } from '../profiles/profiles.repository';
 
 @Injectable()
 export class UploadService {
-  constructor(private readonly profileRepository: ProfilesRepository) {}
+  constructor(
+    private readonly profileRepository: ProfilesRepository,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async handleAvatarUpload(userId: string, file: Express.Multer.File): Promise<{ url: string }> {
     // 1. Dapatkan profil saat ini untuk memeriksa jika sudah ada avatar sebelumnya
@@ -27,6 +31,48 @@ export class UploadService {
     await this.profileRepository.updateAvatarUrl(userId, url);
 
     return { url };
+  }
+
+  // ─── Commission Storage Cleanup & Uploads ────────────────────────────────
+
+  async handleCommissionPreviewUpload(
+    commissionId: string,
+    file: Express.Multer.File,
+  ): Promise<{ url: string }> {
+    // 1. Periksa apakah sudah ada sketchUrl / preview sebelumnya di CommissionProgress
+    const progress = await this.prisma.commissionProgress.findUnique({
+      where: { commissionId },
+    });
+
+    // 2. Jika ada berkas preview lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
+    if (progress?.sketchUrl) {
+      const bucketName = process.env.SUPABASE_BUCKET || 'trubrush';
+      const parts = progress.sketchUrl.split(`/public/${bucketName}/`);
+      if (parts.length > 1) {
+        const oldFilePath = parts[1];
+        await this.deleteFile(oldFilePath);
+      }
+    }
+
+    // 3. Simpan berkas preview baru ke commissions/:commissionId/preview
+    const folderPath = `commissions/${commissionId}/preview`;
+    const url = await this.uploadFile(file, folderPath);
+    return { url };
+  }
+
+  async handleCommissionWipUpload(
+    commissionId: string,
+    files: Express.Multer.File[],
+  ): Promise<{ urls: string[] }> {
+    const folderPath = `commissions/${commissionId}/wip`;
+    const urls: string[] = [];
+
+    for (const file of files) {
+      const url = await this.uploadFile(file, folderPath);
+      urls.push(url);
+    }
+
+    return { urls };
   }
 
   async uploadFile(
