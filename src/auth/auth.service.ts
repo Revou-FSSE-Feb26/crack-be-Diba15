@@ -12,7 +12,7 @@ import type { StringValue } from 'ms';
 import { Role } from '../generated/prisma/enums';
 import { MailService } from '../mail/mail.service';
 import { SessionRepository } from '../session/session.repository';
-import { UserRepository } from '../user/user.repository';
+import { UsersRepository } from '../users/users.repository';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -22,7 +22,7 @@ import { PasswordResetRepository } from './password-reset.repository';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UsersRepository,
     private readonly sessionRepository: SessionRepository,
     private readonly passwordResetRepository: PasswordResetRepository,
     private readonly mailService: MailService,

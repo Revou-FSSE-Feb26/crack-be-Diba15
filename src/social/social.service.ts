@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ArtworkService } from '../artwork/artwork.service';
-import { UserRepository } from '../user/user.repository';
+import { ArtworksService } from '../artworks/artworks.service';
+import { UsersRepository } from '../users/users.repository';
 import { FavoriteRepository } from './favorite.repository';
 import { FollowRepository } from './follow.repository';
 
@@ -9,8 +9,8 @@ export class SocialService {
   constructor(
     private readonly favoriteRepository: FavoriteRepository,
     private readonly followRepository: FollowRepository,
-    private readonly artworkRepository: ArtworkService,
-    private readonly userRepository: UserRepository,
+    private readonly artworkRepository: ArtworksService,
+    private readonly userRepository: UsersRepository,
   ) {}
 
   // ─── Favorite ─────────────────────────────────────────────────────────────

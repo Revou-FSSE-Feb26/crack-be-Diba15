@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ProfileRepository } from '../profile/profile.repository';
+import { ProfilesRepository } from '../profiles/profiles.repository';
 
 @Injectable()
 export class UploadService {
-  constructor(private readonly profileRepository: ProfileRepository) {}
+  constructor(private readonly profileRepository: ProfilesRepository) {}
 
   async handleAvatarUpload(userId: string, file: Express.Multer.File): Promise<{ url: string }> {
     // 1. Dapatkan profil saat ini untuk memeriksa jika sudah ada avatar sebelumnya
