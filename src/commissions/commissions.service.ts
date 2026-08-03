@@ -80,7 +80,7 @@ export class CommissionsService {
   }
 
   async create(clientId: string, dto: CreateCommissionDto) {
-    const { artistsId, price } = dto;
+    const { artistsId } = dto;
 
     if (clientId === artistsId) {
       throw new BadRequestException('Anda tidak dapat memesan komisi ke diri sendiri.');
@@ -105,12 +105,6 @@ export class CommissionsService {
 
     if (!client) {
       throw new NotFoundException('Client tidak ditemukan.');
-    }
-
-    if (client.balance < price) {
-      throw new BadRequestException(
-        `Saldo Anda tidak mencukupi untuk memesan komisi ini. Saldo saat ini: Rp${client.balance.toLocaleString()}, harga komisi: Rp${price.toLocaleString()}.`,
-      );
     }
 
     const commission = await this.commissionsRepository.createCommission(clientId, dto);
@@ -157,6 +151,38 @@ export class CommissionsService {
 
     const updated = await this.commissionsRepository.respondCommission(id, dto.status);
     return this.mapCommissionResponse(updated);
+  }
+
+  async pay(
+    id: string,
+    clientId: string,
+    paymentMethod?: any,
+    cardLastFour?: string,
+  ) {
+    const commission = await this.commissionsRepository.findCommissionById(id);
+
+    if (!commission) {
+      throw new NotFoundException('Komisi tidak ditemukan.');
+    }
+
+    if (commission.clientId !== clientId) {
+      throw new ForbiddenException('Hanya client pemesan yang dapat melakukan pembayaran.');
+    }
+
+    if (commission.paymentStatus === 'paid') {
+      throw new BadRequestException('Komisi ini sudah dibayar sebelumnya.');
+    }
+
+    try {
+      const updated = await this.commissionsRepository.payCommission(
+        id,
+        paymentMethod,
+        cardLastFour,
+      );
+      return this.mapCommissionResponse(updated);
+    } catch (error: any) {
+      throw new BadRequestException(error.message || 'Gagal melakukan pembayaran komisi.');
+    }
   }
 
   async updateProgress(id: string, artistId: string, dto: UpdateProgressDto) {

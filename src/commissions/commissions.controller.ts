@@ -60,6 +60,21 @@ export class CommissionsController {
   }
 
   /**
+   * PATCH /api/commissions/:id/pay
+   * Client melakukan pembayaran komisi setelah diterima oleh artist.
+   */
+  @Patch(':id/pay')
+  @UseGuards(RolesGuard)
+  @Roles('client')
+  pay(
+    @Param('id') id: string,
+    @GetCurrentUser('sub') clientId: string,
+    @Body() body: { paymentMethod?: any; cardLastFour?: string },
+  ) {
+    return this.commissionsService.pay(id, clientId, body.paymentMethod, body.cardLastFour);
+  }
+
+  /**
    * PATCH /api/commissions/:id/progress
    * Artis memperbarui sketsa (sketchUrl) atau hasil akhir (finalArtworkUrl).
    */

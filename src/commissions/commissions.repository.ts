@@ -67,17 +67,7 @@ export class CommissionsRepository {
     const { artistsId, commissionTitle, description, price, paymentMethod } = data;
 
     return this.prisma.$transaction(async (tx) => {
-      // 1. Potong saldo client
-      await tx.user.update({
-        where: { id: clientId },
-        data: {
-          balance: {
-            decrement: price,
-          },
-        },
-      });
-
-      // 2. Buat komisi
+      // 1. Buat komisi dengan status pending & unpaid (saldo dipotong saat client bayar setelah diterima artist)
       const commission = await tx.commission.create({
         data: {
           clientId,
@@ -86,12 +76,12 @@ export class CommissionsRepository {
           description: description || null,
           price,
           status: 'pending',
-          paymentStatus: 'paid',
+          paymentStatus: 'unpaid',
           paymentMethod: paymentMethod || 'wallet',
         },
       });
 
-      // 3. Inisialisasi progress komisi
+      // 2. Inisialisasi progress komisi
       await tx.commissionProgress.create({
         data: {
           commissionId: commission.id,
@@ -139,21 +129,22 @@ export class CommissionsRepository {
       if (!commission) return null;
 
       if (status === 'cancelled' || status === ('rejected' as any)) {
-        // Refund saldo ke client jika ditolak
-        await tx.user.update({
-          where: { id: commission.clientId },
-          data: {
-            balance: {
-              increment: commission.price,
+        if (commission.paymentStatus === 'paid') {
+          await tx.user.update({
+            where: { id: commission.clientId },
+            data: {
+              balance: {
+                increment: commission.price,
+              },
             },
-          },
-        });
+          });
+        }
 
         return tx.commission.update({
           where: { id },
           data: {
             status: 'cancelled',
-            paymentStatus: 'refunded',
+            paymentStatus: commission.paymentStatus === 'paid' ? 'refunded' : 'unpaid',
           },
           ...commissionWithRelationsSelect,
         });
@@ -162,7 +153,50 @@ export class CommissionsRepository {
       return tx.commission.update({
         where: { id },
         data: {
+          status: 'accepted',
+        },
+        ...commissionWithRelationsSelect,
+      });
+    });
+  }
+
+  async payCommission(
+    id: string,
+    paymentMethod: PaymentMethod = 'wallet',
+    cardLastFour?: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      const commission = await tx.commission.findUnique({
+        where: { id },
+      });
+      if (!commission) return null;
+
+      const client = await tx.user.findUnique({
+        where: { id: commission.clientId },
+      });
+
+      if (paymentMethod === 'wallet' && (!client || client.balance < commission.price)) {
+        throw new Error('Saldo E-Wallet Anda tidak mencukupi untuk melakukan pembayaran komisi.');
+      }
+
+      if (paymentMethod === 'wallet' && client) {
+        await tx.user.update({
+          where: { id: commission.clientId },
+          data: {
+            balance: {
+              decrement: commission.price,
+            },
+          },
+        });
+      }
+
+      return tx.commission.update({
+        where: { id },
+        data: {
           status: 'in_progress',
+          paymentStatus: 'paid',
+          paymentMethod,
+          cardLastFour: cardLastFour || null,
         },
         ...commissionWithRelationsSelect,
       });
