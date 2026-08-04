@@ -34,6 +34,16 @@ export class DisputesService {
             role: dispute.mediator.role,
           }
         : undefined,
+      progress: dispute.commission?.progress
+        ? {
+            id: dispute.commission.progress.id,
+            sketch_url: dispute.commission.progress.sketchUrl || null,
+            sketch_approved: dispute.commission.progress.sketchApproved,
+            final_artwork_url: dispute.commission.progress.finalArtworkUrl || null,
+            final_artwork_approved: dispute.commission.progress.finalArtworkApproved,
+            updated_at: dispute.commission.progress.updatedAt.toISOString(),
+          }
+        : undefined,
       commission: dispute.commission
         ? {
             id: dispute.commission.id,
@@ -45,6 +55,16 @@ export class DisputesService {
             status: dispute.commission.status,
             payment_status: dispute.commission.paymentStatus,
             payment_method: dispute.commission.paymentMethod,
+            progress: dispute.commission.progress
+              ? {
+                  id: dispute.commission.progress.id,
+                  sketch_url: dispute.commission.progress.sketchUrl || null,
+                  sketch_approved: dispute.commission.progress.sketchApproved,
+                  final_artwork_url: dispute.commission.progress.finalArtworkUrl || null,
+                  final_artwork_approved: dispute.commission.progress.finalArtworkApproved,
+                  updated_at: dispute.commission.progress.updatedAt.toISOString(),
+                }
+              : undefined,
             artist: dispute.commission.artist
               ? {
                   id: dispute.commission.artist.id,

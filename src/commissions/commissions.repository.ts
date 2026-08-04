@@ -160,11 +160,7 @@ export class CommissionsRepository {
     });
   }
 
-  async payCommission(
-    id: string,
-    paymentMethod: PaymentMethod = 'wallet',
-    cardLastFour?: string,
-  ) {
+  async payCommission(id: string, paymentMethod: PaymentMethod = 'wallet', cardLastFour?: string) {
     return this.prisma.$transaction(async (tx) => {
       const commission = await tx.commission.findUnique({
         where: { id },
@@ -205,19 +201,26 @@ export class CommissionsRepository {
 
   async updateProgress(
     commissionId: string,
-    data: { sketchUrl?: string; finalArtworkUrl?: string },
+    data: {
+      sketch_url?: string;
+      final_artwork_url?: string;
+      final_file_url?: string;
+    },
   ) {
     return this.prisma.$transaction(async (tx) => {
       await tx.commissionProgress.upsert({
         where: { commissionId },
         update: {
-          sketchUrl: data.sketchUrl !== undefined ? data.sketchUrl : undefined,
-          finalArtworkUrl: data.finalArtworkUrl !== undefined ? data.finalArtworkUrl : undefined,
+          sketchUrl: data.sketch_url !== undefined ? data.sketch_url : undefined,
+          finalArtworkUrl:
+            data.final_artwork_url !== undefined ? data.final_artwork_url : undefined,
+          finalFileUrl: data.final_file_url !== undefined ? data.final_file_url : undefined,
         },
         create: {
           commissionId,
-          sketchUrl: data.sketchUrl || null,
-          finalArtworkUrl: data.finalArtworkUrl || null,
+          sketchUrl: data.sketch_url || null,
+          finalArtworkUrl: data.final_artwork_url || null,
+          finalFileUrl: data.final_file_url || null,
         },
       });
 
@@ -241,29 +244,51 @@ export class CommissionsRepository {
           data: { sketchApproved: true },
         });
       } else if (step === 'final') {
-        // Approve final -> pelepasan dana dari escrow ke wallet artis
+        // Approve preview final oleh Client -> menandai finalArtworkApproved: true
         await tx.commissionProgress.update({
           where: { commissionId },
           data: { finalArtworkApproved: true },
         });
+      }
 
-        await tx.user.update({
-          where: { id: commission.artistsId },
-          data: {
-            balance: {
-              increment: commission.price,
-            },
-          },
-        });
+      return tx.commission.findUnique({
+        where: { id: commissionId },
+        ...commissionWithRelationsSelect,
+      });
+    });
+  }
 
-        await tx.commission.update({
+  async completeCommission(commissionId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const commission = await tx.commission.findUnique({
+        where: { id: commissionId },
+      });
+      if (!commission) return null;
+
+      if (commission.status === 'completed') {
+        return tx.commission.findUnique({
           where: { id: commissionId },
-          data: {
-            status: 'completed',
-            paymentStatus: 'released',
-          },
+          ...commissionWithRelationsSelect,
         });
       }
+
+      // Transfer saldo dari Escrow ke wallet artis
+      await tx.user.update({
+        where: { id: commission.artistsId },
+        data: {
+          balance: {
+            increment: commission.price,
+          },
+        },
+      });
+
+      await tx.commission.update({
+        where: { id: commissionId },
+        data: {
+          status: 'completed',
+          paymentStatus: 'released',
+        },
+      });
 
       return tx.commission.findUnique({
         where: { id: commissionId },

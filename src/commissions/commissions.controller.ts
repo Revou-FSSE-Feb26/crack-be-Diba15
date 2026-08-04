@@ -105,6 +105,17 @@ export class CommissionsController {
   }
 
   /**
+   * PATCH /api/commissions/:id/complete
+   * Artis menyelesaikan komisi dan melepaskan dana escrow setelah mengunggah berkas akhir.
+   */
+  @Patch(':id/complete')
+  @UseGuards(RolesGuard)
+  @Roles('artist')
+  completeCommission(@Param('id') id: string, @GetCurrentUser('sub') artistId: string) {
+    return this.commissionsService.completeCommission(id, artistId);
+  }
+
+  /**
    * POST /api/commissions/:id/revisions
    * Menambahkan komentar revisi.
    */

@@ -132,21 +132,11 @@ export class DisputesRepository {
           },
         });
       } else if (status === 'rejected') {
-        // Dispute ditolak (Artis menang) -> Release saldo ke Artis
-        await tx.user.update({
-          where: { id: commission.artistsId },
-          data: {
-            balance: {
-              increment: commission.price,
-            },
-          },
-        });
-
+        // Dispute ditolak (Artis menang sengketa) -> Komisi kembali ke status revision (Review Hasil)
         await tx.commission.update({
           where: { id: commission.id },
           data: {
-            status: 'completed',
-            paymentStatus: 'released',
+            status: 'revision',
           },
         });
       }

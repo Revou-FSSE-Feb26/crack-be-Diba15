@@ -3,9 +3,13 @@ import { IsOptional, IsUrl } from 'class-validator';
 export class UpdateProgressDto {
   @IsOptional()
   @IsUrl({}, { message: 'Format URL sketsa tidak valid.' })
-  sketchUrl?: string;
+  sketch_url?: string;
 
   @IsOptional()
   @IsUrl({}, { message: 'Format URL final artwork tidak valid.' })
-  finalArtworkUrl?: string;
+  final_artwork_url?: string;
+
+  @IsOptional()
+  @IsUrl({}, { message: 'Format URL berkas akhir tidak valid.' })
+  final_file_url?: string;
 }

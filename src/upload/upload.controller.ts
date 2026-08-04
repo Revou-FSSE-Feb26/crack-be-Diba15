@@ -12,12 +12,16 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
+import { CommissionsRepository } from '../commissions/commissions.repository';
 import { UploadService } from './upload.service';
 
 @Controller('upload')
 @UseGuards(JwtAccessGuard)
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly commissionsRepository: CommissionsRepository,
+  ) {}
 
   // ─── Single File Upload (POST /api/upload) — KHUSUS AVATAR ──────────────────
   @Post()
@@ -175,6 +179,10 @@ export class UploadController {
 
     const folderPath = `commissions/${commissionId}/final`;
     const url = await this.uploadService.uploadFile(file, folderPath);
+
+    await this.commissionsRepository.updateProgress(commissionId, {
+      final_file_url: url,
+    });
 
     return { url };
   }

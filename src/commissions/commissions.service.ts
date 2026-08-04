@@ -58,6 +58,7 @@ export class CommissionsService {
             sketch_approved: commission.progress.sketchApproved,
             final_artwork_url: commission.progress.finalArtworkUrl || null,
             final_artwork_approved: commission.progress.finalArtworkApproved,
+            final_file_url: (commission.progress as any).finalFileUrl || null,
             updated_at: commission.progress.updatedAt.toISOString(),
           }
         : undefined,
@@ -153,12 +154,7 @@ export class CommissionsService {
     return this.mapCommissionResponse(updated);
   }
 
-  async pay(
-    id: string,
-    clientId: string,
-    paymentMethod?: any,
-    cardLastFour?: string,
-  ) {
+  async pay(id: string, clientId: string, paymentMethod?: any, cardLastFour?: string) {
     const commission = await this.commissionsRepository.findCommissionById(id);
 
     if (!commission) {
@@ -230,6 +226,27 @@ export class CommissionsService {
     }
 
     const updated = await this.commissionsRepository.approveStep(id, step);
+    return this.mapCommissionResponse(updated);
+  }
+
+  async completeCommission(id: string, artistId: string) {
+    const commission = await this.commissionsRepository.findCommissionById(id);
+
+    if (!commission) {
+      throw new NotFoundException('Komisi tidak ditemukan.');
+    }
+
+    if (commission.artistsId !== artistId) {
+      throw new ForbiddenException(
+        'Hanya artis penerima komisi yang dapat mengunggah berkas akhir.',
+      );
+    }
+
+    if (!commission.progress?.finalArtworkApproved) {
+      throw new BadRequestException('Client belum menyetujui pratinjau hasil karya akhir.');
+    }
+
+    const updated = await this.commissionsRepository.completeCommission(id);
     return this.mapCommissionResponse(updated);
   }
 
