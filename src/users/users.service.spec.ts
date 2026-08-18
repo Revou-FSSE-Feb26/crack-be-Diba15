@@ -44,6 +44,7 @@ describe('UsersService', () => {
       findOneWithProfile: jest.fn(),
       getBalance: jest.fn(),
       topUp: jest.fn(),
+      withdraw: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
     };
@@ -155,6 +156,65 @@ describe('UsersService', () => {
 
     it('should throw BadRequestException if amount is <= 0', async () => {
       await expect(service.topUp('u-005', { amount: 0 })).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('withdraw', () => {
+    const artistMockUser = {
+      ...mockUser,
+      id: 'u-001',
+      role: 'artist' as const,
+      balance: 1000000,
+    };
+
+    const withdrawDto = {
+      amount: 250000,
+      bankName: 'BCA',
+      accountNumber: '1234567890',
+      accountName: 'Ari Ramadan',
+    };
+
+    it('should withdraw artist balance successfully if funds and role are valid', async () => {
+      (usersRepository.findById as jest.Mock).mockResolvedValue(artistMockUser);
+      (usersRepository.withdraw as jest.Mock).mockResolvedValue({
+        ...artistMockUser,
+        balance: 750000,
+      });
+
+      const result = await service.withdraw('u-001', withdrawDto);
+      expect(result.message).toContain('berhasil diproses');
+      expect(result.payout.amount).toBe(250000);
+      expect(result.user.balance).toBe(750000);
+      expect(usersRepository.withdraw).toHaveBeenCalledWith('u-001', 250000);
+    });
+
+    it('should throw BadRequestException if amount is < 100000', async () => {
+      await expect(
+        service.withdraw('u-001', { ...withdrawDto, amount: 50000 }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw ForbiddenException if user is not an artist', async () => {
+      (usersRepository.findById as jest.Mock).mockResolvedValue({
+        ...mockUser,
+        role: 'client',
+        balance: 1000000,
+      });
+
+      await expect(service.withdraw('u-005', withdrawDto)).rejects.toThrow(
+        'Hanya akun artist yang dapat melakukan penarikan dana.',
+      );
+    });
+
+    it('should throw BadRequestException if balance is insufficient', async () => {
+      (usersRepository.findById as jest.Mock).mockResolvedValue({
+        ...artistMockUser,
+        balance: 150000,
+      });
+
+      await expect(
+        service.withdraw('u-001', { ...withdrawDto, amount: 250000 }),
+      ).rejects.toThrow('Saldo Anda tidak mencukupi untuk melakukan penarikan dana ini.');
     });
   });
 

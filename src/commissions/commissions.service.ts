@@ -77,6 +77,28 @@ export class CommissionsService {
               : undefined,
           }))
         : [],
+      dispute: commission.dispute
+        ? {
+            id: commission.dispute.id,
+            commission_id: commission.dispute.commissionId,
+            reason: commission.dispute.reason,
+            status: commission.dispute.status,
+            mediator_id: commission.dispute.mediatorId || null,
+            created_at: commission.dispute.createdAt.toISOString(),
+          }
+        : null,
+      disputes: commission.dispute
+        ? [
+            {
+              id: commission.dispute.id,
+              commission_id: commission.dispute.commissionId,
+              reason: commission.dispute.reason,
+              status: commission.dispute.status,
+              mediator_id: commission.dispute.mediatorId || null,
+              created_at: commission.dispute.createdAt.toISOString(),
+            },
+          ]
+        : [],
     };
   }
 

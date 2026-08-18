@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import type { CreateUserDto } from './dto/create-user.dto';
 import type { TopUpDto } from './dto/topup.dto';
 import type { UpdateUserDto } from './dto/update-user.dto';
+import type { WithdrawDto } from './dto/withdraw.dto';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
@@ -89,6 +91,38 @@ export class UsersService {
     const updated = await this.usersRepository.topUp(userId, dto.amount);
     return {
       message: 'Top-up saldo berhasil.',
+      user: updated,
+    };
+  }
+
+  async withdraw(userId: string, dto: WithdrawDto) {
+    if (!dto.amount || dto.amount < 100000) {
+      throw new BadRequestException('Minimal penarikan dana adalah Rp 100.000.');
+    }
+
+    const user = await this.usersRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User tidak ditemukan.');
+    }
+
+    if (user.role !== 'artist') {
+      throw new ForbiddenException('Hanya akun artist yang dapat melakukan penarikan dana.');
+    }
+
+    if (user.balance < dto.amount) {
+      throw new BadRequestException('Saldo Anda tidak mencukupi untuk melakukan penarikan dana ini.');
+    }
+
+    const updated = await this.usersRepository.withdraw(userId, dto.amount);
+    return {
+      message: `Permintaan penarikan dana sebesar Rp ${dto.amount.toLocaleString('id-ID')} berhasil diproses.`,
+      payout: {
+        amount: dto.amount,
+        bankName: dto.bankName,
+        accountNumber: dto.accountNumber,
+        accountName: dto.accountName,
+        processedAt: new Date().toISOString(),
+      },
       user: updated,
     };
   }

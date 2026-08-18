@@ -114,16 +114,29 @@ export class ReportsRepository {
         ...reportWithRelationsSelect,
       });
 
-      if (status === 'resolved' && report.artwork?.artistsId) {
-        const artistId = report.artwork.artistsId;
-        await tx.profile.update({
-          where: { userId: artistId },
-          data: {
-            strikeCount: {
-              increment: 1,
+      if (status === 'resolved') {
+        const targetArtworkId = report.artworkId || report.targetId;
+        if (targetArtworkId) {
+          await tx.artwork.update({
+            where: { id: targetArtworkId },
+            data: {
+              isVisibleOnFeed: false,
+              curationStatus: 'flagged',
             },
-          },
-        });
+          });
+        }
+
+        if (report.artwork?.artistsId) {
+          const artistId = report.artwork.artistsId;
+          await tx.profile.update({
+            where: { userId: artistId },
+            data: {
+              strikeCount: {
+                increment: 1,
+              },
+            },
+          });
+        }
       }
 
       return updatedReport;

@@ -115,6 +115,24 @@ export class UsersRepository {
     });
   }
 
+  async withdraw(id: string, amount: number) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        balance: {
+          decrement: amount,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        balance: true,
+      },
+    });
+  }
+
   async delete(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }

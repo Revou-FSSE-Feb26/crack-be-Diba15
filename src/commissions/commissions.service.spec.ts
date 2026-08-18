@@ -115,18 +115,13 @@ describe('CommissionsService', () => {
       expect(result?.status).toBe('pending');
     });
 
-    it('should throw BadRequestException if client has insufficient balance', async () => {
+    it('should throw BadRequestException if artist is not open for commission', async () => {
       const findFirstMock = (prismaService.user as any).findFirst as jest.Mock;
-      const findUniqueMock = (prismaService.user as any).findUnique as jest.Mock;
 
       findFirstMock.mockResolvedValue({
         id: 'u-001',
         role: 'artist',
-        profile: { isOpenForCommission: true },
-      });
-      findUniqueMock.mockResolvedValue({
-        id: 'u-005',
-        balance: 100000, // Insufficient for 450000
+        profile: { isOpenForCommission: false },
       });
 
       await expect(
@@ -164,6 +159,32 @@ describe('CommissionsService', () => {
       });
 
       expect(result?.status).toBe('in_progress');
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return commission detail including mapped dispute if dispute exists', async () => {
+      const mockCommissionWithDispute = {
+        ...mockCommission,
+        dispute: {
+          id: 'd-001',
+          commissionId: 'c-001',
+          reason: 'Hasil tidak sesuai',
+          status: 'approved' as const,
+          mediatorId: 'u-008',
+          createdAt: new Date('2024-06-15T10:00:00Z'),
+        },
+      };
+
+      (commissionsRepository.findCommissionById as jest.Mock).mockResolvedValue(
+        mockCommissionWithDispute,
+      );
+
+      const result = await service.findOne('c-001', 'u-005', 'client');
+      expect(result).toBeDefined();
+      expect(result?.dispute).toBeDefined();
+      expect(result?.dispute?.status).toBe('approved');
+      expect(result?.disputes).toHaveLength(1);
     });
   });
 });

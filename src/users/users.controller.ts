@@ -17,6 +17,7 @@ import type { JwtPayload } from '../auth/strategies/jwt-access.strategy';
 import { CreateUserDto } from './dto/create-user.dto';
 import { TopUpDto } from './dto/topup.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -42,6 +43,16 @@ export class UsersController {
   @Post('topup')
   topUp(@GetCurrentUser('sub') userId: string, @Body() dto: TopUpDto) {
     return this.usersService.topUp(userId, dto);
+  }
+
+  /**
+   * POST /api/users/withdraw
+   * Tarik saldo / pencairan dana (khusus artist, min Rp 100.000).
+   */
+  @Post('withdraw')
+  @Roles('artist')
+  withdraw(@GetCurrentUser('sub') userId: string, @Body() dto: WithdrawDto) {
+    return this.usersService.withdraw(userId, dto);
   }
 
   // ─── Admin Only ──────────────────────────────────────────────────────────────
