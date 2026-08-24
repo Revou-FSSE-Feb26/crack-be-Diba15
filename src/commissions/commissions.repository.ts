@@ -272,12 +272,16 @@ export class CommissionsRepository {
         });
       }
 
-      // Transfer saldo dari Escrow ke wallet artis
+      // Hitung potongan platform fee 5% dan dana bersih yang diterima artis (95%)
+      const platformFee = Math.round(commission.price * 0.05);
+      const artistPayout = commission.price - platformFee;
+
+      // Transfer saldo bersih dari Escrow ke wallet artis
       await tx.user.update({
         where: { id: commission.artistsId },
         data: {
           balance: {
-            increment: commission.price,
+            increment: artistPayout,
           },
         },
       });

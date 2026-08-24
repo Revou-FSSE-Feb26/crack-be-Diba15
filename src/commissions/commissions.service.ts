@@ -27,6 +27,8 @@ export class CommissionsService {
       commission_title: commission.commissionTitle,
       description: commission.description,
       price: commission.price,
+      platform_fee: Math.round(commission.price * 0.05),
+      net_artist_amount: commission.price - Math.round(commission.price * 0.05),
       status: commission.status,
       payment_status: commission.paymentStatus,
       payment_method: commission.paymentMethod,

@@ -63,6 +63,7 @@ describe('CommissionsService', () => {
       approveStep: jest.fn(),
       addRevision: jest.fn(),
       cancelCommission: jest.fn(),
+      completeCommission: jest.fn(),
     };
 
     prismaService = {
@@ -203,6 +204,32 @@ describe('CommissionsService', () => {
       expect(result?.dispute).toBeDefined();
       expect(result?.dispute?.status).toBe('approved');
       expect(result?.disputes).toHaveLength(1);
+    });
+  });
+
+  describe('complete and platform fee', () => {
+    it('should complete commission and calculate 5% platform fee and 95% net artist payout', async () => {
+      const approvedMock = {
+        ...mockCommission,
+        progress: {
+          ...mockCommission.progress,
+          finalArtworkApproved: true,
+        },
+      };
+      const completedMock = {
+        ...approvedMock,
+        status: 'completed',
+        paymentStatus: 'released',
+      };
+      (commissionsRepository.findCommissionById as jest.Mock).mockResolvedValue(approvedMock);
+      (commissionsRepository.completeCommission as jest.Mock).mockResolvedValue(completedMock);
+
+      const result = await service.completeCommission('c-001', 'u-001');
+      expect(result).toBeDefined();
+      expect(result?.status).toBe('completed');
+      expect(result?.price).toBe(450000);
+      expect(result?.platform_fee).toBe(22500); // 5% of 450,000
+      expect(result?.net_artist_amount).toBe(427500); // 95% of 450,000
     });
   });
 });
