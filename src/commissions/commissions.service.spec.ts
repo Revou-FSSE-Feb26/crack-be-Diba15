@@ -95,7 +95,7 @@ describe('CommissionsService', () => {
       findFirstMock.mockResolvedValue({
         id: 'u-001',
         role: 'artist',
-        profile: { isOpenForCommission: true },
+        profile: { isVerified: true, isOpenForCommission: true },
       });
       findUniqueMock.mockResolvedValue({
         id: 'u-005',
@@ -115,13 +115,31 @@ describe('CommissionsService', () => {
       expect(result?.status).toBe('pending');
     });
 
+    it('should throw BadRequestException if artist is not verified', async () => {
+      const findFirstMock = (prismaService.user as any).findFirst as jest.Mock;
+
+      findFirstMock.mockResolvedValue({
+        id: 'u-001',
+        role: 'artist',
+        profile: { isVerified: false, isOpenForCommission: true },
+      });
+
+      await expect(
+        service.create('u-005', {
+          artistsId: 'u-001',
+          commissionTitle: 'Tes Komisi',
+          price: 450000,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should throw BadRequestException if artist is not open for commission', async () => {
       const findFirstMock = (prismaService.user as any).findFirst as jest.Mock;
 
       findFirstMock.mockResolvedValue({
         id: 'u-001',
         role: 'artist',
-        profile: { isOpenForCommission: false },
+        profile: { isVerified: true, isOpenForCommission: false },
       });
 
       await expect(

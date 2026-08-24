@@ -118,6 +118,10 @@ export class CommissionsService {
       throw new NotFoundException('Artis penerima komisi tidak ditemukan.');
     }
 
+    if (!artist.profile.isVerified) {
+      throw new BadRequestException('Artis ini belum terverifikasi oleh kurator dan belum dapat menerima pesanan komisi.');
+    }
+
     if (!artist.profile.isOpenForCommission) {
       throw new BadRequestException('Artis ini sedang tidak menerima komisi.');
     }

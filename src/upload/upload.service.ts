@@ -35,16 +35,16 @@ export class UploadService {
 
   // ─── Commission Storage Cleanup & Uploads ────────────────────────────────
 
-  async handleCommissionPreviewUpload(
+  async handleCommissionSketchUpload(
     commissionId: string,
     file: Express.Multer.File,
   ): Promise<{ url: string }> {
-    // 1. Periksa apakah sudah ada sketchUrl / preview sebelumnya di CommissionProgress
+    // 1. Periksa apakah sudah ada sketchUrl sebelumnya di CommissionProgress
     const progress = await this.prisma.commissionProgress.findUnique({
       where: { commissionId },
     });
 
-    // 2. Jika ada berkas preview lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
+    // 2. Jika ada berkas sketsa lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
     if (progress?.sketchUrl) {
       const bucketName = process.env.SUPABASE_BUCKET || 'trubrush';
       const parts = progress.sketchUrl.split(`/public/${bucketName}/`);
@@ -54,8 +54,58 @@ export class UploadService {
       }
     }
 
-    // 3. Simpan berkas preview baru ke commissions/:commissionId/preview
+    // 3. Simpan berkas sketsa baru ke commissions/:commissionId/sketch
+    const folderPath = `commissions/${commissionId}/sketch`;
+    const url = await this.uploadFile(file, folderPath);
+    return { url };
+  }
+
+  async handleCommissionPreviewUpload(
+    commissionId: string,
+    file: Express.Multer.File,
+  ): Promise<{ url: string }> {
+    // 1. Periksa apakah sudah ada finalArtworkUrl sebelumnya di CommissionProgress
+    const progress = await this.prisma.commissionProgress.findUnique({
+      where: { commissionId },
+    });
+
+    // 2. Jika ada berkas preview final lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
+    if (progress?.finalArtworkUrl) {
+      const bucketName = process.env.SUPABASE_BUCKET || 'trubrush';
+      const parts = progress.finalArtworkUrl.split(`/public/${bucketName}/`);
+      if (parts.length > 1) {
+        const oldFilePath = parts[1];
+        await this.deleteFile(oldFilePath);
+      }
+    }
+
+    // 3. Simpan berkas preview final baru ke commissions/:commissionId/preview
     const folderPath = `commissions/${commissionId}/preview`;
+    const url = await this.uploadFile(file, folderPath);
+    return { url };
+  }
+
+  async handleCommissionFinalUpload(
+    commissionId: string,
+    file: Express.Multer.File,
+  ): Promise<{ url: string }> {
+    // 1. Periksa apakah sudah ada finalFileUrl sebelumnya di CommissionProgress
+    const progress = await this.prisma.commissionProgress.findUnique({
+      where: { commissionId },
+    });
+
+    // 2. Jika ada berkas arsip final lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
+    if ((progress as any)?.finalFileUrl) {
+      const bucketName = process.env.SUPABASE_BUCKET || 'trubrush';
+      const parts = (progress as any).finalFileUrl.split(`/public/${bucketName}/`);
+      if (parts.length > 1) {
+        const oldFilePath = parts[1];
+        await this.deleteFile(oldFilePath);
+      }
+    }
+
+    // 3. Simpan berkas hasil akhir ke commissions/:commissionId/final
+    const folderPath = `commissions/${commissionId}/final`;
     const url = await this.uploadFile(file, folderPath);
     return { url };
   }
