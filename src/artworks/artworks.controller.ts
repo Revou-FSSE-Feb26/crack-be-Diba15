@@ -32,13 +32,20 @@ export class ArtworksController {
     @Query('artistId') artistId?: string,
     @Query('curationStatus') curationStatus?: string,
     @Query('isVisibleOnFeed') isVisibleOnFeed?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
+    const pageNum = page ? Number.parseInt(page, 10) : undefined;
+    const limitNum = limit ? Number.parseInt(limit, 10) : undefined;
+
     return this.artworksService.findAll({
       search,
       tag,
       artistId,
       curationStatus,
       isVisibleOnFeed,
+      page: pageNum && !Number.isNaN(pageNum) ? pageNum : undefined,
+      limit: limitNum && !Number.isNaN(limitNum) ? limitNum : undefined,
     });
   }
 

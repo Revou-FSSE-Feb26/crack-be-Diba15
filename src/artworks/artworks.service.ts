@@ -74,7 +74,27 @@ export class ArtworksService {
     artistId?: string;
     curationStatus?: string;
     isVisibleOnFeed?: string;
+    page?: number;
+    limit?: number;
   }) {
+    if (filters.page && filters.limit) {
+      const [artworks, total] = await Promise.all([
+        this.artworksRepository.findAll(filters),
+        this.artworksRepository.count(filters),
+      ]);
+      const totalPages = Math.ceil(total / filters.limit);
+      return {
+        data: artworks.map((a) => this.mapToFrontendArtwork(a)),
+        meta: {
+          page: filters.page,
+          limit: filters.limit,
+          total,
+          total_pages: totalPages,
+          has_more: filters.page < totalPages,
+        },
+      };
+    }
+
     const artworks = await this.artworksRepository.findAll(filters);
     return artworks.map((a) => this.mapToFrontendArtwork(a));
   }

@@ -103,7 +103,7 @@ export class ArtworksRepository {
     });
   }
 
-  async findAll(filters: {
+  private buildWhereClause(filters: {
     search?: string;
     tag?: string;
     artistId?: string;
@@ -149,13 +149,44 @@ export class ArtworksRepository {
       where.isVisibleOnFeed = filters.isVisibleOnFeed === 'true';
     }
 
-    return this.prisma.artwork.findMany({
+    return where;
+  }
+
+  async count(filters: {
+    search?: string;
+    tag?: string;
+    artistId?: string;
+    curationStatus?: string;
+    isVisibleOnFeed?: string;
+  }) {
+    const where = this.buildWhereClause(filters);
+    return this.prisma.artwork.count({ where });
+  }
+
+  async findAll(filters: {
+    search?: string;
+    tag?: string;
+    artistId?: string;
+    curationStatus?: string;
+    isVisibleOnFeed?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const where = this.buildWhereClause(filters);
+    const queryOptions: any = {
       where,
       orderBy: {
         createdAt: 'desc',
       },
       ...artworkWithRelationsSelect,
-    });
+    };
+
+    if (filters.page && filters.limit) {
+      queryOptions.skip = (filters.page - 1) * filters.limit;
+      queryOptions.take = filters.limit;
+    }
+
+    return this.prisma.artwork.findMany(queryOptions);
   }
 
   async update(id: string, dto: UpdateArtworkDto) {
