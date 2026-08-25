@@ -12,6 +12,7 @@ export interface CommissionsRepositoryInterface {
     },
   ): Promise<any>;
   findCommissionsByUser(userId: string, role?: 'client' | 'artist'): Promise<any[]>;
+  findAllCommissions(role?: 'client' | 'artist'): Promise<any[]>;
   findCommissionById(id: string): Promise<any | null>;
   respondCommission(id: string, status: CommissionStatus): Promise<any>;
   payCommission(id: string, paymentMethod?: PaymentMethod, cardLastFour?: string): Promise<any>;

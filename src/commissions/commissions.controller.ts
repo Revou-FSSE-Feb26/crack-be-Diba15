@@ -38,8 +38,8 @@ export class CommissionsController {
   @Get()
   @ApiOperation({ summary: 'Melihat daftar komisi pengguna' })
   @ApiResponse({ status: 200, description: 'Daftar komisi' })
-  findAll(@GetCurrentUser('sub') userId: string, @Query('as') role?: 'client' | 'artist') {
-    return this.commissionsService.findAllByUser(userId, role);
+  findAll(@GetCurrentUser() requester: JwtPayload, @Query('as') role?: 'client' | 'artist') {
+    return this.commissionsService.findAllByUser(requester.sub, requester.role, role);
   }
 
   /**

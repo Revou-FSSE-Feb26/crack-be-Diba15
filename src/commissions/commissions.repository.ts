@@ -115,6 +115,23 @@ export class CommissionsRepository implements CommissionsRepositoryInterface {
     });
   }
 
+  async findAllCommissions(role?: 'client' | 'artist') {
+    const where: any = {};
+    if (role === 'artist') {
+      where.artistsId = { not: undefined };
+    } else if (role === 'client') {
+      where.clientId = { not: undefined };
+    }
+
+    return this.prisma.commission.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      ...commissionWithRelationsSelect,
+    });
+  }
+
   async findCommissionById(id: string) {
     return this.prisma.commission.findUnique({
       where: { id },

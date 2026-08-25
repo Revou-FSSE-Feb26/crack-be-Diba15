@@ -55,6 +55,7 @@ describe('CommissionsService', () => {
     commissionsRepository = {
       createCommission: jest.fn(),
       findCommissionsByUser: jest.fn(),
+      findAllCommissions: jest.fn(),
       findCommissionById: jest.fn(),
       respondCommission: jest.fn(),
       updateProgress: jest.fn(),
@@ -140,14 +141,24 @@ describe('CommissionsService', () => {
   });
 
   describe('findAllByUser', () => {
-    it('should return list of user commissions', async () => {
+    it('should return list of user commissions for client/artist', async () => {
       (commissionsRepository.findCommissionsByUser as jest.Mock).mockResolvedValue([
         mockCommission,
       ]);
 
-      const results = await service.findAllByUser('u-005', 'client');
+      const results = await service.findAllByUser('u-005', 'client', 'client');
       expect(results).toHaveLength(1);
       expect(results[0]?.id).toBe('c-001');
+      expect(commissionsRepository.findCommissionsByUser).toHaveBeenCalledWith('u-005', 'client');
+    });
+
+    it('should return all platform commissions if requester is admin', async () => {
+      (commissionsRepository.findAllCommissions as jest.Mock).mockResolvedValue([mockCommission]);
+
+      const results = await service.findAllByUser('u-004', 'admin');
+      expect(results).toHaveLength(1);
+      expect(results[0]?.id).toBe('c-001');
+      expect(commissionsRepository.findAllCommissions).toHaveBeenCalled();
     });
   });
 

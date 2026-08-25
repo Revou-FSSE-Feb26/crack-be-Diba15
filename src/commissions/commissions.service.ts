@@ -127,7 +127,12 @@ export class CommissionsService {
     return this.mapCommissionResponse(commission);
   }
 
-  async findAllByUser(userId: string, role?: 'client' | 'artist') {
+  async findAllByUser(userId: string, requesterRole?: string, role?: 'client' | 'artist') {
+    if (requesterRole === 'admin') {
+      const commissions = await this.commissionsRepository.findAllCommissions(role);
+      return commissions.map((c) => this.mapCommissionResponse(c));
+    }
+
     const commissions = await this.commissionsRepository.findCommissionsByUser(userId, role);
     return commissions.map((c) => this.mapCommissionResponse(c));
   }
