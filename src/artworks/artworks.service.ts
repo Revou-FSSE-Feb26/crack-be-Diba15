@@ -236,11 +236,13 @@ export class ArtworksService {
       base_price_idr: artist.profile?.basePriceIdr || null,
       approved_portfolio_count: artist.profile?.approvedPortfolioCount || 0,
       followersCount: artist._count.followers || 0,
+      created_at: artist.createdAt,
       user: {
         id: artist.id,
         name: artist.name,
         email: artist.email,
         role: artist.role,
+        created_at: artist.createdAt,
       },
     };
   }

@@ -64,6 +64,7 @@ describe('ArtworksService', () => {
     _count: {
       followers: 10,
     },
+    createdAt: new Date('2024-06-12T09:00:00Z'),
   };
 
   beforeEach(async () => {
@@ -148,6 +149,15 @@ describe('ArtworksService', () => {
       const artists = await service.findAllArtists();
       expect(artists).toHaveLength(1);
       expect(artists[0].id).toBe('u-001');
+    });
+
+    it('should find artist by id with created_at included', async () => {
+      (artistsRepository.findArtistById as jest.Mock).mockResolvedValue(mockArtist);
+
+      const artist = await service.findArtistById('u-001');
+      expect(artist.id).toBe('u-001');
+      expect(artist.created_at).toEqual(new Date('2024-06-12T09:00:00Z'));
+      expect(artist.user.name).toBe('Ari Ramadan');
     });
   });
 });
