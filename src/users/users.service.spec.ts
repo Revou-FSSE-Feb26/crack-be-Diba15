@@ -189,9 +189,9 @@ describe('UsersService', () => {
     });
 
     it('should throw BadRequestException if amount is < 100000', async () => {
-      await expect(
-        service.withdraw('u-001', { ...withdrawDto, amount: 50000 }),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.withdraw('u-001', { ...withdrawDto, amount: 50000 })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw ForbiddenException if user is not an artist', async () => {
@@ -212,9 +212,9 @@ describe('UsersService', () => {
         balance: 150000,
       });
 
-      await expect(
-        service.withdraw('u-001', { ...withdrawDto, amount: 250000 }),
-      ).rejects.toThrow('Saldo Anda tidak mencukupi untuk melakukan penarikan dana ini.');
+      await expect(service.withdraw('u-001', { ...withdrawDto, amount: 250000 })).rejects.toThrow(
+        'Saldo Anda tidak mencukupi untuk melakukan penarikan dana ini.',
+      );
     });
   });
 

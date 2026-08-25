@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CommissionsRepository } from './commissions.repository';
 import type { CreateCommissionDto } from './dto/create-commission.dto';
 import type { CreateRevisionDto } from './dto/create-revision.dto';
@@ -13,13 +12,24 @@ import type { UpdateProgressDto } from './dto/update-progress.dto';
 
 @Injectable()
 export class CommissionsService {
-  constructor(
-    private readonly commissionsRepository: CommissionsRepository,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly commissionsRepository: CommissionsRepository) {}
+
+  private mapDispute(dispute: any) {
+    if (!dispute) return null;
+    return {
+      id: dispute.id,
+      commission_id: dispute.commissionId,
+      reason: dispute.reason,
+      status: dispute.status,
+      mediator_id: dispute.mediatorId || null,
+      created_at: dispute.createdAt.toISOString(),
+    };
+  }
 
   private mapCommissionResponse(commission: any) {
     if (!commission) return null;
+    const mappedDispute = this.mapDispute(commission.dispute);
+
     return {
       id: commission.id,
       artists_id: commission.artistsId,
@@ -79,28 +89,8 @@ export class CommissionsService {
               : undefined,
           }))
         : [],
-      dispute: commission.dispute
-        ? {
-            id: commission.dispute.id,
-            commission_id: commission.dispute.commissionId,
-            reason: commission.dispute.reason,
-            status: commission.dispute.status,
-            mediator_id: commission.dispute.mediatorId || null,
-            created_at: commission.dispute.createdAt.toISOString(),
-          }
-        : null,
-      disputes: commission.dispute
-        ? [
-            {
-              id: commission.dispute.id,
-              commission_id: commission.dispute.commissionId,
-              reason: commission.dispute.reason,
-              status: commission.dispute.status,
-              mediator_id: commission.dispute.mediatorId || null,
-              created_at: commission.dispute.createdAt.toISOString(),
-            },
-          ]
-        : [],
+      dispute: mappedDispute,
+      disputes: mappedDispute ? [mappedDispute] : [],
     };
   }
 
@@ -111,26 +101,23 @@ export class CommissionsService {
       throw new BadRequestException('Anda tidak dapat memesan komisi ke diri sendiri.');
     }
 
-    const artist = await this.prisma.user.findFirst({
-      where: { id: artistsId, role: 'artist' },
-      include: { profile: true },
-    });
+    const artist = await this.commissionsRepository.findArtistWithProfile(artistsId);
 
     if (!artist?.profile) {
       throw new NotFoundException('Artis penerima komisi tidak ditemukan.');
     }
 
     if (!artist.profile.isVerified) {
-      throw new BadRequestException('Artis ini belum terverifikasi oleh kurator dan belum dapat menerima pesanan komisi.');
+      throw new BadRequestException(
+        'Artis ini belum terverifikasi oleh kurator dan belum dapat menerima pesanan komisi.',
+      );
     }
 
     if (!artist.profile.isOpenForCommission) {
       throw new BadRequestException('Artis ini sedang tidak menerima komisi.');
     }
 
-    const client = await this.prisma.user.findUnique({
-      where: { id: clientId },
-    });
+    const client = await this.commissionsRepository.findClientUser(clientId);
 
     if (!client) {
       throw new NotFoundException('Client tidak ditemukan.');

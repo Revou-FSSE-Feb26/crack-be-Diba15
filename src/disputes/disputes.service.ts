@@ -5,17 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { DisputeStatus } from '../generated/prisma/enums';
-import { PrismaService } from '../prisma/prisma.service';
 import { DisputesRepository } from './disputes.repository';
 import type { CreateDisputeDto } from './dto/create-dispute.dto';
 import type { ResolveDisputeDto } from './dto/resolve-dispute.dto';
 
 @Injectable()
 export class DisputesService {
-  constructor(
-    private readonly disputesRepository: DisputesRepository,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly disputesRepository: DisputesRepository) {}
 
   private mapDisputeResponse(dispute: any) {
     if (!dispute) return null;
@@ -89,9 +85,7 @@ export class DisputesService {
   async create(reporterId: string, dto: CreateDisputeDto) {
     const { commissionId, reason } = dto;
 
-    const commission = await this.prisma.commission.findUnique({
-      where: { id: commissionId },
-    });
+    const commission = await this.disputesRepository.findCommissionById(commissionId);
 
     if (!commission) {
       throw new NotFoundException('Komisi tidak ditemukan.');

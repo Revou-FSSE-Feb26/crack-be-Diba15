@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import type { ProfilesRepositoryInterface } from '../common/interfaces/profiles.repository.interface';
 import type { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class ProfilesRepository {
+export class ProfilesRepository implements ProfilesRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByUserId(userId: string) {

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { ReportsRepositoryInterface } from '../common/interfaces/reports.repository.interface';
 import type { ReportStatus, ReportTargetType } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -46,7 +47,7 @@ const reportWithRelationsSelect = {
 };
 
 @Injectable()
-export class ReportsRepository {
+export class ReportsRepository implements ReportsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async createReport(
@@ -140,6 +141,12 @@ export class ReportsRepository {
       }
 
       return updatedReport;
+    });
+  }
+
+  async findArtworkById(id: string) {
+    return this.prisma.artwork.findUnique({
+      where: { id },
     });
   }
 }

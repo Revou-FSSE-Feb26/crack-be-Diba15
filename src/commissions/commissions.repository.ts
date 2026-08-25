@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { CommissionsRepositoryInterface } from '../common/interfaces/commissions.repository.interface';
 import type { CommissionStatus, PaymentMethod } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -51,7 +52,7 @@ const commissionWithRelationsSelect = {
 };
 
 @Injectable()
-export class CommissionsRepository {
+export class CommissionsRepository implements CommissionsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async createCommission(
@@ -350,6 +351,25 @@ export class CommissionsRepository {
         },
         ...commissionWithRelationsSelect,
       });
+    });
+  }
+
+  async findArtistWithProfile(id: string) {
+    return this.prisma.user.findFirst({
+      where: { id, role: 'artist' },
+      include: { profile: true },
+    });
+  }
+
+  async findClientUser(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  async findCommissionProgress(commissionId: string) {
+    return this.prisma.commissionProgress.findUnique({
+      where: { commissionId },
     });
   }
 }

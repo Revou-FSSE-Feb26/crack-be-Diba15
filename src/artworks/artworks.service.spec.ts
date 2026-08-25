@@ -1,11 +1,14 @@
-import { BadRequestException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
+import { ArtistsRepository } from './artists.repository';
 import { ArtworksRepository } from './artworks.repository';
 import { ArtworksService } from './artworks.service';
+import { TagsRepository } from './tags.repository';
 
 describe('ArtworksService', () => {
   let service: ArtworksService;
   let artworksRepository: jest.Mocked<Partial<ArtworksRepository>>;
+  let tagsRepository: jest.Mocked<Partial<TagsRepository>>;
+  let artistsRepository: jest.Mocked<Partial<ArtistsRepository>>;
 
   const mockArtwork = {
     id: 'a-001',
@@ -41,6 +44,28 @@ describe('ArtworksService', () => {
     ],
   };
 
+  const mockArtist = {
+    id: 'u-001',
+    name: 'Ari Ramadan',
+    email: 'ari@example.com',
+    role: 'artist',
+    profile: {
+      avatarUrl: null,
+      bio: 'Digital illustrator',
+      instagramUrl: null,
+      twitterUrl: null,
+      pixivUrl: null,
+      websiteUrl: null,
+      isVerified: true,
+      isOpenForCommission: true,
+      basePriceIdr: 450000,
+      approvedPortfolioCount: 6,
+    },
+    _count: {
+      followers: 10,
+    },
+  };
+
   beforeEach(async () => {
     artworksRepository = {
       findAll: jest.fn(),
@@ -51,13 +76,25 @@ describe('ArtworksService', () => {
       create: jest.fn(),
       update: jest.fn(),
       curate: jest.fn(),
-      remove: jest.fn(),
+      delete: jest.fn(),
+    };
+
+    tagsRepository = {
+      getPopularTags: jest.fn(),
+      findAllTags: jest.fn(),
+    };
+
+    artistsRepository = {
+      findAllArtists: jest.fn(),
+      findArtistById: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ArtworksService,
         { provide: ArtworksRepository, useValue: artworksRepository },
+        { provide: TagsRepository, useValue: tagsRepository },
+        { provide: ArtistsRepository, useValue: artistsRepository },
       ],
     }).compile();
 
@@ -91,6 +128,26 @@ describe('ArtworksService', () => {
       expect((result as any).meta.limit).toBe(6);
       expect((result as any).meta.total_pages).toBe(2);
       expect((result as any).meta.has_more).toBe(true);
+    });
+  });
+
+  describe('tags and artists delegation', () => {
+    it('should get popular tags from tagsRepository', async () => {
+      (tagsRepository.getPopularTags as jest.Mock).mockResolvedValue([
+        { id: 't-001', tag_name: 'cyberpunk', count: 5 },
+      ]);
+
+      const tags = await service.getPopularTags();
+      expect(tags).toHaveLength(1);
+      expect(tags[0].tag_name).toBe('cyberpunk');
+    });
+
+    it('should find all artists from artistsRepository', async () => {
+      (artistsRepository.findAllArtists as jest.Mock).mockResolvedValue([mockArtist]);
+
+      const artists = await service.findAllArtists();
+      expect(artists).toHaveLength(1);
+      expect(artists[0].id).toBe('u-001');
     });
   });
 });

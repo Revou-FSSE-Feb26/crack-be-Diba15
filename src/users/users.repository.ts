@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import type { UsersRepositoryInterface } from '../common/interfaces/users.repository.interface';
 import type { Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class UsersRepository {
+export class UsersRepository implements UsersRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string) {

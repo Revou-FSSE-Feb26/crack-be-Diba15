@@ -110,7 +110,9 @@ export class UsersService {
     }
 
     if (user.balance < dto.amount) {
-      throw new BadRequestException('Saldo Anda tidak mencukupi untuk melakukan penarikan dana ini.');
+      throw new BadRequestException(
+        'Saldo Anda tidak mencukupi untuk melakukan penarikan dana ini.',
+      );
     }
 
     const updated = await this.usersRepository.withdraw(userId, dto.amount);

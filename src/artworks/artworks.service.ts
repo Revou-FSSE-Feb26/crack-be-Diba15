@@ -4,14 +4,20 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ArtistsRepository } from './artists.repository';
 import { ArtworksRepository } from './artworks.repository';
 import type { CreateArtworkDto } from './dto/create-artwork.dto';
 import type { CurateArtworkDto } from './dto/curate-artwork.dto';
 import type { UpdateArtworkDto } from './dto/update-artwork.dto';
+import { TagsRepository } from './tags.repository';
 
 @Injectable()
 export class ArtworksService {
-  constructor(private readonly artworksRepository: ArtworksRepository) {}
+  constructor(
+    private readonly artworksRepository: ArtworksRepository,
+    private readonly tagsRepository: TagsRepository,
+    private readonly artistsRepository: ArtistsRepository,
+  ) {}
 
   mapToFrontendArtwork(artwork: any) {
     if (!artwork) return null;
@@ -155,11 +161,11 @@ export class ArtworksService {
   }
 
   async getPopularTags() {
-    return this.artworksRepository.getPopularTags();
+    return this.tagsRepository.getPopularTags();
   }
 
   async findAllArtists() {
-    const artists = await this.artworksRepository.findAllArtists();
+    const artists = await this.artistsRepository.findAllArtists();
 
     const mapped = artists.map((a) => {
       return {
@@ -200,7 +206,7 @@ export class ArtworksService {
   }
 
   async findAllTags() {
-    const tags = await this.artworksRepository.findAllTags();
+    const tags = await this.tagsRepository.findAllTags();
     return tags.map((t) => ({
       id: t.id,
       tag_name: t.tagName,
@@ -208,7 +214,7 @@ export class ArtworksService {
   }
 
   async findArtistById(id: string) {
-    const artist = await this.artworksRepository.findArtistById(id);
+    const artist = await this.artistsRepository.findArtistById(id);
 
     if (!artist) {
       throw new NotFoundException('Artis tidak ditemukan.');

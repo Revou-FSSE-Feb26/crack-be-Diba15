@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { ArtworksRepositoryInterface } from '../common/interfaces/artworks.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateArtworkDto } from './dto/create-artwork.dto';
 import type { CurateArtworkDto } from './dto/curate-artwork.dto';
@@ -28,7 +29,7 @@ const artworkWithRelationsSelect = {
 };
 
 @Injectable()
-export class ArtworksRepository {
+export class ArtworksRepository implements ArtworksRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async findProfileByUserId(userId: string) {
@@ -304,106 +305,6 @@ export class ArtworksRepository {
           isVerified: isEligible,
         },
       });
-    });
-  }
-
-  async getPopularTags() {
-    const tagsCount = await this.prisma.artworkTag.groupBy({
-      by: ['tagId'],
-      _count: {
-        artworkId: true,
-      },
-      orderBy: {
-        _count: {
-          artworkId: 'desc',
-        },
-      },
-      take: 10,
-    });
-
-    const popularTags: any[] = [];
-    for (const item of tagsCount) {
-      const tag = await this.prisma.tag.findUnique({
-        where: { id: item.tagId },
-      });
-      if (tag) {
-        popularTags.push({
-          id: tag.id,
-          tag_name: tag.tagName,
-          count: item._count.artworkId,
-        });
-      }
-    }
-
-    return popularTags;
-  }
-
-  async findAllArtists() {
-    return this.prisma.user.findMany({
-      where: { role: 'artist' },
-      select: {
-        id: true,
-        name: true,
-        role: true,
-        createdAt: true,
-        profile: {
-          select: {
-            avatarUrl: true,
-            bio: true,
-            instagramUrl: true,
-            twitterUrl: true,
-            pixivUrl: true,
-            websiteUrl: true,
-            isVerified: true,
-            isOpenForCommission: true,
-            basePriceIdr: true,
-            approvedPortfolioCount: true,
-          },
-        },
-        _count: {
-          select: {
-            followers: true,
-          },
-        },
-      },
-    });
-  }
-
-  async findAllTags() {
-    return this.prisma.tag.findMany({
-      orderBy: { tagName: 'asc' },
-    });
-  }
-
-  async findArtistById(id: string) {
-    return this.prisma.user.findFirst({
-      where: { id, role: 'artist' },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        profile: {
-          select: {
-            avatarUrl: true,
-            bio: true,
-            instagramUrl: true,
-            twitterUrl: true,
-            pixivUrl: true,
-            websiteUrl: true,
-            isVerified: true,
-            isOpenForCommission: true,
-            basePriceIdr: true,
-            approvedPortfolioCount: true,
-          },
-        },
-        _count: {
-          select: {
-            followers: true,
-          },
-        },
-      },
     });
   }
 }

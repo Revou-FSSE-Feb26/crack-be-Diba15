@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common';
+import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from '@nestjs/common';
 import { ArtworksModule } from './artworks/artworks.module';
 import { AuthModule } from './auth/auth.module';
 import { CommissionsModule } from './commissions/commissions.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { MaintenanceCheckMiddleware } from './common/middleware/maintenance-check.middleware';
 import { DisputesModule } from './disputes/disputes.module';
 import { MailModule } from './mail/mail.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -28,4 +30,10 @@ import { UsersModule } from './users/users.module';
     DisputesModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware, MaintenanceCheckMiddleware)
+      .forRoutes({ path: '*path', method: RequestMethod.ALL });
+  }
+}

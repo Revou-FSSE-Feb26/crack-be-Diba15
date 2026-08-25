@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { CommissionsRepository } from '../commissions/commissions.repository';
 import { ProfilesRepository } from '../profiles/profiles.repository';
 
 @Injectable()
 export class UploadService {
   constructor(
     private readonly profileRepository: ProfilesRepository,
-    private readonly prisma: PrismaService,
+    private readonly commissionsRepository: CommissionsRepository,
   ) {}
 
   async handleAvatarUpload(userId: string, file: Express.Multer.File): Promise<{ url: string }> {
@@ -40,9 +40,7 @@ export class UploadService {
     file: Express.Multer.File,
   ): Promise<{ url: string }> {
     // 1. Periksa apakah sudah ada sketchUrl sebelumnya di CommissionProgress
-    const progress = await this.prisma.commissionProgress.findUnique({
-      where: { commissionId },
-    });
+    const progress = await this.commissionsRepository.findCommissionProgress(commissionId);
 
     // 2. Jika ada berkas sketsa lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
     if (progress?.sketchUrl) {
@@ -65,9 +63,7 @@ export class UploadService {
     file: Express.Multer.File,
   ): Promise<{ url: string }> {
     // 1. Periksa apakah sudah ada finalArtworkUrl sebelumnya di CommissionProgress
-    const progress = await this.prisma.commissionProgress.findUnique({
-      where: { commissionId },
-    });
+    const progress = await this.commissionsRepository.findCommissionProgress(commissionId);
 
     // 2. Jika ada berkas preview final lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
     if (progress?.finalArtworkUrl) {
@@ -90,9 +86,7 @@ export class UploadService {
     file: Express.Multer.File,
   ): Promise<{ url: string }> {
     // 1. Periksa apakah sudah ada finalFileUrl sebelumnya di CommissionProgress
-    const progress = await this.prisma.commissionProgress.findUnique({
-      where: { commissionId },
-    });
+    const progress = await this.commissionsRepository.findCommissionProgress(commissionId);
 
     // 2. Jika ada berkas arsip final lama, hapus otomatis dari Supabase Storage sebelum simpan yang baru
     if ((progress as any)?.finalFileUrl) {

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import type { FollowRepositoryInterface } from '../common/interfaces/follow.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class FollowRepository {
+export class FollowRepository implements FollowRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async findFollow(followerId: string, artistId: string) {

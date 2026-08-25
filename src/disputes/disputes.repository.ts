@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { DisputesRepositoryInterface } from '../common/interfaces/disputes.repository.interface';
 import type { DisputeStatus } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -46,7 +47,7 @@ const disputeWithRelationsSelect = {
 };
 
 @Injectable()
-export class DisputesRepository {
+export class DisputesRepository implements DisputesRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async createDispute(commissionId: string, reason: string) {
@@ -149,6 +150,12 @@ export class DisputesRepository {
         },
         ...disputeWithRelationsSelect,
       });
+    });
+  }
+
+  async findCommissionById(id: string) {
+    return this.prisma.commission.findUnique({
+      where: { id },
     });
   }
 }

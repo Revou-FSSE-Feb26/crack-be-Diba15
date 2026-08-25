@@ -12,7 +12,7 @@ import type { StringValue } from 'ms';
 import { Role } from '../generated/prisma/enums';
 import { MailService } from '../mail/mail.service';
 import { SessionRepository } from '../session/session.repository';
-import { UsersRepository } from '../users/users.repository';
+import { AuthRepository } from './auth.repository';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -22,7 +22,7 @@ import { PasswordResetRepository } from './password-reset.repository';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userRepository: UsersRepository,
+    private readonly authRepository: AuthRepository,
     private readonly sessionRepository: SessionRepository,
     private readonly passwordResetRepository: PasswordResetRepository,
     private readonly mailService: MailService,
@@ -32,12 +32,12 @@ export class AuthService {
   // ─── Register ─────────────────────────────────────────────────────────────
 
   async register(dto: RegisterDto, userAgent?: string) {
-    const existing = await this.userRepository.findByEmail(dto.email);
+    const existing = await this.authRepository.findByEmail(dto.email);
     if (existing) throw new ConflictException('Email sudah terdaftar.');
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-    const user = await this.userRepository.createWithProfile({
+    const user = await this.authRepository.register({
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
@@ -53,7 +53,7 @@ export class AuthService {
   // ─── Login ─────────────────────────────────────────────────────────────────
 
   async login(dto: LoginDto, userAgent?: string) {
-    const user = await this.userRepository.findByEmail(dto.email);
+    const user = await this.authRepository.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException('Email atau password salah.');
 
     const passwordMatch = await bcrypt.compare(dto.password, user.password);
@@ -67,26 +67,24 @@ export class AuthService {
 
   // ─── Refresh ────────────────────────────────────────────────────────────────
 
-  async refresh(userId: string, refreshToken: string) {
+  private async findMatchingSession(userId: string, refreshToken: string) {
     const sessions = await this.sessionRepository.findSessionsByUserId(userId);
-    if (!sessions || sessions.length === 0) {
-      throw new ForbiddenException('Akses ditolak.');
-    }
+    if (!sessions || sessions.length === 0) return null;
 
-    let activeSession: any = null;
     for (const s of sessions) {
       const isMatch = await bcrypt.compare(refreshToken, s.refreshToken);
-      if (isMatch) {
-        activeSession = s;
-        break;
-      }
+      if (isMatch) return s;
     }
+    return null;
+  }
 
+  async refresh(userId: string, refreshToken: string) {
+    const activeSession = await this.findMatchingSession(userId, refreshToken);
     if (!activeSession) {
-      throw new ForbiddenException('Refresh token tidak valid.');
+      throw new ForbiddenException('Akses ditolak atau refresh token tidak valid.');
     }
 
-    const user = await this.userRepository.findById(userId);
+    const user = await this.authRepository.findById(userId);
     if (!user) throw new ForbiddenException('User tidak ditemukan.');
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
@@ -104,13 +102,9 @@ export class AuthService {
     try {
       const decoded = this.jwtService.decode(refreshToken) as { sub?: string };
       if (decoded?.sub) {
-        const sessions = await this.sessionRepository.findSessionsByUserId(decoded.sub);
-        for (const s of sessions) {
-          const isMatch = await bcrypt.compare(refreshToken, s.refreshToken);
-          if (isMatch) {
-            await this.sessionRepository.deleteSession(s.id);
-            break;
-          }
+        const activeSession = await this.findMatchingSession(decoded.sub, refreshToken);
+        if (activeSession) {
+          await this.sessionRepository.deleteSession(activeSession.id);
         }
       }
     } catch {
@@ -121,7 +115,7 @@ export class AuthService {
   // ─── Forgot Password ────────────────────────────────────────────────────────
 
   async forgotPassword(dto: ForgotPasswordDto) {
-    const user = await this.userRepository.findByEmail(dto.email);
+    const user = await this.authRepository.findByEmail(dto.email);
 
     // Keamanan: Untuk mencegah email enumeration, selalu kembalikan pesan sukses
     if (!user) {
@@ -177,9 +171,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
 
     // Update password di User table
-    await this.userRepository.update(resetRecord.userId, {
-      password: hashedPassword,
-    });
+    await this.authRepository.updatePassword(resetRecord.userId, hashedPassword);
 
     // Hapus token reset yang sudah terpakai
     await this.passwordResetRepository.deleteToken(resetRecord.id);
@@ -196,7 +188,7 @@ export class AuthService {
   // ─── Me ─────────────────────────────────────────────────────────────────────
 
   async getMe(userId: string) {
-    return this.userRepository.findOneWithProfile(userId);
+    return this.authRepository.findByIdWithProfile(userId);
   }
 
   // ─── Helpers ─────────────────────────────────────────────────────────────────

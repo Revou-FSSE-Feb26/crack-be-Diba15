@@ -10,11 +10,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
 import { CommissionsRepository } from '../commissions/commissions.repository';
 import { UploadService } from './upload.service';
 
+@ApiTags('Upload')
+@ApiBearerAuth('JWT-auth')
 @Controller('upload')
 @UseGuards(JwtAccessGuard)
 export class UploadController {
