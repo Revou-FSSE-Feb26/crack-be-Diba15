@@ -125,6 +125,21 @@ export class DisputesRepository implements DisputesRepositoryInterface {
           },
         });
 
+        await tx.walletTransaction.create({
+          data: {
+            userId: commission.clientId,
+            type: 'refund',
+            amount: commission.price,
+            title: 'Pengembalian Dana Resolusi Sengketa Komisi',
+            commissionId: commission.id,
+            status: 'success',
+            metadata: {
+              dispute_id: id,
+              mediator_id: mediatorId,
+            },
+          },
+        });
+
         await tx.commission.update({
           where: { id: commission.id },
           data: {

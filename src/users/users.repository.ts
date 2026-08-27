@@ -99,38 +99,66 @@ export class UsersRepository implements UsersRepositoryInterface {
   }
 
   async topUp(id: string, amount: number) {
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        balance: {
-          increment: amount,
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          balance: {
+            increment: amount,
+          },
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        balance: true,
-      },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          balance: true,
+        },
+      });
+
+      await tx.walletTransaction.create({
+        data: {
+          userId: id,
+          type: 'topup',
+          amount,
+          title: 'Top Up Saldo E-Wallet',
+          status: 'success',
+        },
+      });
+
+      return user;
     });
   }
 
   async withdraw(id: string, amount: number) {
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        balance: {
-          decrement: amount,
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          balance: {
+            decrement: amount,
+          },
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        balance: true,
-      },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          balance: true,
+        },
+      });
+
+      await tx.walletTransaction.create({
+        data: {
+          userId: id,
+          type: 'withdraw',
+          amount,
+          title: 'Penarikan Dana Artis (Withdraw)',
+          status: 'success',
+        },
+      });
+
+      return user;
     });
   }
 

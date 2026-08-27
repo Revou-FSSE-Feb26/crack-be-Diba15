@@ -156,6 +156,17 @@ export class CommissionsRepository implements CommissionsRepositoryInterface {
               },
             },
           });
+
+          await tx.walletTransaction.create({
+            data: {
+              userId: commission.clientId,
+              type: 'refund',
+              amount: commission.price,
+              title: `Pengembalian Dana Penolakan Komisi "${commission.commissionTitle}"`,
+              commissionId: commission.id,
+              status: 'success',
+            },
+          });
         }
 
         return tx.commission.update({
@@ -203,6 +214,21 @@ export class CommissionsRepository implements CommissionsRepositoryInterface {
           },
         });
       }
+
+      await tx.walletTransaction.create({
+        data: {
+          userId: commission.clientId,
+          type: 'payment',
+          amount: commission.price,
+          title: `Pembayaran Komisi "${commission.commissionTitle}" (Escrow)`,
+          commissionId: commission.id,
+          status: 'success',
+          metadata: {
+            payment_method: paymentMethod,
+            card_last_four: cardLastFour || null,
+          },
+        },
+      });
 
       return tx.commission.update({
         where: { id },
@@ -304,6 +330,30 @@ export class CommissionsRepository implements CommissionsRepositoryInterface {
         },
       });
 
+      // Catat mutasi pencairan dana ke artis
+      await tx.walletTransaction.create({
+        data: {
+          userId: commission.artistsId,
+          type: 'release',
+          amount: artistPayout,
+          title: `Pencairan Dana Komisi "${commission.commissionTitle}"`,
+          commissionId: commission.id,
+          status: 'success',
+        },
+      });
+
+      // Catat mutasi fee platform 5%
+      await tx.walletTransaction.create({
+        data: {
+          userId: commission.artistsId,
+          type: 'platform_fee',
+          amount: platformFee,
+          title: `Biaya Layanan Platform 5% ("${commission.commissionTitle}")`,
+          commissionId: commission.id,
+          status: 'success',
+        },
+      });
+
       await tx.commission.update({
         where: { id: commissionId },
         data: {
@@ -350,21 +400,34 @@ export class CommissionsRepository implements CommissionsRepositoryInterface {
       });
       if (!commission) return null;
 
-      // Refund dana ke client
-      await tx.user.update({
-        where: { id: commission.clientId },
-        data: {
-          balance: {
-            increment: commission.price,
+      if (commission.paymentStatus === 'paid') {
+        // Refund dana ke client
+        await tx.user.update({
+          where: { id: commission.clientId },
+          data: {
+            balance: {
+              increment: commission.price,
+            },
           },
-        },
-      });
+        });
+
+        await tx.walletTransaction.create({
+          data: {
+            userId: commission.clientId,
+            type: 'refund',
+            amount: commission.price,
+            title: `Pengembalian Dana Pembatalan Komisi "${commission.commissionTitle}"`,
+            commissionId: commission.id,
+            status: 'success',
+          },
+        });
+      }
 
       return tx.commission.update({
         where: { id: commissionId },
         data: {
           status: 'cancelled',
-          paymentStatus: 'refunded',
+          paymentStatus: commission.paymentStatus === 'paid' ? 'refunded' : 'unpaid',
         },
         ...commissionWithRelationsSelect,
       });

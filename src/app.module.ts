@@ -11,6 +11,7 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ReportsModule } from './reports/reports.module';
 import { SessionModule } from './session/session.module';
 import { SocialModule } from './social/social.module';
+import { TransactionsModule } from './transactions/transactions.module';
 import { UploadModule } from './upload/upload.module';
 import { UsersModule } from './users/users.module';
 
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     ReportsModule,
     CommissionsModule,
     DisputesModule,
+    TransactionsModule,
   ],
 })
 export class AppModule implements NestModule {

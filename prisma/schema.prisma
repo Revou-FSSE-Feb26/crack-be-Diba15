@@ -79,6 +79,21 @@ enum DisputeStatus {
   rejected
 }
 
+enum TransactionType {
+  topup
+  withdraw
+  payment
+  release
+  refund
+  platform_fee
+}
+
+enum TransactionStatus {
+  pending
+  success
+  failed
+}
+
 // =============================================================================
 // USER & PROFILE
 // =============================================================================
@@ -105,9 +120,10 @@ model User {
   reportsCurating     Report[]          @relation("ReportCurator")
   artworksReviewed    Artwork[]         @relation("ArtworkReviewer")
   favorites           Favorite[]
-  following           Follow[]          @relation("Follower")
-  followers           Follow[]          @relation("FollowedArtist")
+  following           Follow[]             @relation("Follower")
+  followers           Follow[]             @relation("FollowedArtist")
   passwordResetTokens PasswordResetToken[]
+  walletTransactions  WalletTransaction[]
 
   @@map("users")
 }
@@ -216,9 +232,10 @@ model Commission {
   // Relations
   artist    User                 @relation("ArtistCommissions", fields: [artistsId], references: [id])
   client    User                 @relation("ClientCommissions", fields: [clientId], references: [id])
-  progress  CommissionProgress?
-  revisions Revision[]
-  dispute   DisputeLog?
+  progress     CommissionProgress?
+  revisions    Revision[]
+  dispute      DisputeLog?
+  transactions WalletTransaction[]
 
   @@map("commissions")
 }
@@ -331,4 +348,25 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
+}
+
+// =============================================================================
+// WALLET TRANSACTION / LEDGER
+// =============================================================================
+
+model WalletTransaction {
+  id           String            @id @default(uuid())
+  userId       String            @map("user_id")
+  type         TransactionType
+  amount       Float
+  title        String
+  status       TransactionStatus @default(success)
+  commissionId String?           @map("commission_id")
+  metadata     Json?             @map("metadata")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commission Commission? @relation(fields: [commissionId], references: [id])
+
+  @@map("wallet_transactions")
 }
