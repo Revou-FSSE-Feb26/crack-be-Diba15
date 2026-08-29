@@ -219,7 +219,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2024-05-01T10:00:00Z'),
+      createdAt: new Date('2026-08-01T10:00:00Z'),
     },
     {
       id: 'a-002',
@@ -235,7 +235,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2024-05-15T14:00:00Z'),
+      createdAt: new Date('2026-08-05T14:00:00Z'),
     },
     {
       id: 'a-003',
@@ -253,7 +253,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2024-06-02T09:30:00Z'),
+      createdAt: new Date('2026-08-10T09:30:00Z'),
     },
     {
       id: 'a-004',
@@ -268,7 +268,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2024-06-20T16:00:00Z'),
+      createdAt: new Date('2026-08-15T16:00:00Z'),
     },
     {
       id: 'a-005',
@@ -281,7 +281,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2024-07-05T11:00:00Z'),
+      createdAt: new Date('2026-08-18T11:00:00Z'),
     },
     {
       id: 'a-006',
@@ -293,7 +293,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2024-07-18T13:00:00Z'),
+      createdAt: new Date('2026-08-20T13:00:00Z'),
     },
     {
       id: 'a-007',
@@ -306,7 +306,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'pending' as const,
       isVisibleOnFeed: false,
-      createdAt: new Date('2024-08-01T09:00:00Z'),
+      createdAt: new Date('2026-08-22T09:00:00Z'),
     },
     {
       id: 'a-008',
@@ -321,7 +321,7 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'pending' as const,
       isVisibleOnFeed: false,
-      createdAt: new Date('2024-08-03T14:30:00Z'),
+      createdAt: new Date('2026-08-23T14:30:00Z'),
     },
     {
       id: 'a-009',
@@ -334,7 +334,7 @@ async function main() {
       uploadType: 'fanart' as const,
       curationStatus: 'pending' as const,
       isVisibleOnFeed: false,
-      createdAt: new Date('2024-08-05T11:15:00Z'),
+      createdAt: new Date('2026-08-24T11:15:00Z'),
     },
   ];
 
@@ -406,8 +406,8 @@ async function main() {
       price: 650000,
       status: 'in_progress' as const,
       paymentStatus: 'paid' as const,
-      createdAt: new Date('2024-07-02T10:15:00Z'),
-      updatedAt: new Date('2024-07-06T08:45:00Z'),
+      createdAt: new Date('2026-08-02T10:15:00Z'),
+      updatedAt: new Date('2026-08-06T08:45:00Z'),
     },
     {
       id: 'c-003',
@@ -418,8 +418,8 @@ async function main() {
       price: 300000,
       status: 'revision' as const,
       paymentStatus: 'paid' as const,
-      createdAt: new Date('2024-07-01T13:20:00Z'),
-      updatedAt: new Date('2024-07-05T11:10:00Z'),
+      createdAt: new Date('2026-08-01T13:20:00Z'),
+      updatedAt: new Date('2026-08-05T11:10:00Z'),
     },
     {
       id: 'c-004',
@@ -430,8 +430,8 @@ async function main() {
       price: 275000,
       status: 'pending' as const,
       paymentStatus: 'unpaid' as const,
-      createdAt: new Date('2024-07-04T16:00:00Z'),
-      updatedAt: new Date('2024-07-04T16:00:00Z'),
+      createdAt: new Date('2026-08-04T16:00:00Z'),
+      updatedAt: new Date('2026-08-04T16:00:00Z'),
     },
   ];
 

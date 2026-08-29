@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { CommissionsModule } from './commissions/commissions.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { MaintenanceCheckMiddleware } from './common/middleware/maintenance-check.middleware';
+import { CuratorPerformanceModule } from './curator-performance/curator-performance.module';
 import { DisputesModule } from './disputes/disputes.module';
 import { MailModule } from './mail/mail.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -34,6 +35,7 @@ import { UsersModule } from './users/users.module';
     TransactionsModule,
     AppealsModule,
     AuditLogsModule,
+    CuratorPerformanceModule,
   ],
 })
 export class AppModule implements NestModule {
