@@ -1,5 +1,7 @@
 import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from '@nestjs/common';
+import { AppealsModule } from './appeals/appeals.module';
 import { ArtworksModule } from './artworks/artworks.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { AuthModule } from './auth/auth.module';
 import { CommissionsModule } from './commissions/commissions.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
@@ -30,6 +32,8 @@ import { UsersModule } from './users/users.module';
     CommissionsModule,
     DisputesModule,
     TransactionsModule,
+    AppealsModule,
+    AuditLogsModule,
   ],
 })
 export class AppModule implements NestModule {

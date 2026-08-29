@@ -79,6 +79,12 @@ enum DisputeStatus {
   rejected
 }
 
+enum AppealStatus {
+  pending
+  approved
+  rejected
+}
+
 enum TransactionType {
   topup
   withdraw
@@ -124,6 +130,8 @@ model User {
   followers           Follow[]             @relation("FollowedArtist")
   passwordResetTokens PasswordResetToken[]
   walletTransactions  WalletTransaction[]
+  appealsSubmitted    Appeal[]             @relation("ArtistAppeals")
+  appealsResolved     Appeal[]             @relation("AdminResolvedAppeals")
 
   @@map("users")
 }
@@ -369,4 +377,24 @@ model WalletTransaction {
   commission Commission? @relation(fields: [commissionId], references: [id])
 
   @@map("wallet_transactions")
+}
+
+// =============================================================================
+// APPEAL (BANDING AKUN ARTIST)
+// =============================================================================
+
+model Appeal {
+  id              String       @id @default(uuid())
+  artistId        String       @map("artist_id")
+  reason          String
+  status          AppealStatus @default(pending)
+  resolvedById    String?      @map("resolved_by_id")
+  resolutionNotes String?      @map("resolution_notes")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  artist     User  @relation("ArtistAppeals", fields: [artistId], references: [id], onDelete: Cascade)
+  resolvedBy User? @relation("AdminResolvedAppeals", fields: [resolvedById], references: [id])
+
+  @@map("appeals")
 }
