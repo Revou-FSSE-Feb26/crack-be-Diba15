@@ -83,6 +83,11 @@ describe('ArtworksService', () => {
     tagsRepository = {
       getPopularTags: jest.fn(),
       findAllTags: jest.fn(),
+      findTagById: jest.fn(),
+      findTagByName: jest.fn(),
+      createTag: jest.fn(),
+      updateTag: jest.fn(),
+      deleteTag: jest.fn(),
     };
 
     artistsRepository = {
@@ -141,6 +146,62 @@ describe('ArtworksService', () => {
       const tags = await service.getPopularTags();
       expect(tags).toHaveLength(1);
       expect(tags[0].tag_name).toBe('cyberpunk');
+    });
+
+    it('should find all tags with count from tagsRepository', async () => {
+      (tagsRepository.findAllTags as jest.Mock).mockResolvedValue([
+        {
+          id: 't-001',
+          tagName: 'cyberpunk',
+          _count: { artworks: 3 },
+        },
+      ]);
+
+      const tags = await service.findAllTags();
+      expect(tags).toHaveLength(1);
+      expect(tags[0].tag_name).toBe('cyberpunk');
+      expect(tags[0].count).toBe(3);
+    });
+
+    it('should create new tag successfully', async () => {
+      (tagsRepository.findTagByName as jest.Mock).mockResolvedValue(null);
+      (tagsRepository.createTag as jest.Mock).mockResolvedValue({
+        id: 't-002',
+        tagName: 'watercolor',
+        _count: { artworks: 0 },
+      });
+
+      const created = await service.createTag({ tagName: 'Watercolor ' });
+      expect(created.id).toBe('t-002');
+      expect(created.tag_name).toBe('watercolor');
+      expect(tagsRepository.createTag).toHaveBeenCalledWith('watercolor');
+    });
+
+    it('should update tag successfully', async () => {
+      (tagsRepository.findTagById as jest.Mock).mockResolvedValue({
+        id: 't-001',
+        tagName: 'cyberpunk',
+      });
+      (tagsRepository.findTagByName as jest.Mock).mockResolvedValue(null);
+      (tagsRepository.updateTag as jest.Mock).mockResolvedValue({
+        id: 't-001',
+        tagName: 'cyberpunk-city',
+        _count: { artworks: 3 },
+      });
+
+      const updated = await service.updateTag('t-001', { tagName: 'cyberpunk-city' });
+      expect(updated.tag_name).toBe('cyberpunk-city');
+    });
+
+    it('should delete tag successfully', async () => {
+      (tagsRepository.findTagById as jest.Mock).mockResolvedValue({
+        id: 't-001',
+        tagName: 'cyberpunk',
+      });
+      (tagsRepository.deleteTag as jest.Mock).mockResolvedValue({});
+
+      const res = await service.deleteTag('t-001');
+      expect(res.message).toContain('berhasil dihapus');
     });
 
     it('should find all artists from artistsRepository', async () => {

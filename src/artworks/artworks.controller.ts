@@ -17,8 +17,10 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import type { JwtPayload } from '../auth/strategies/jwt-access.strategy';
 import { ArtworksService } from './artworks.service';
 import { CreateArtworkDto } from './dto/create-artwork.dto';
+import { CreateTagDto } from './dto/create-tag.dto';
 import { CurateArtworkDto } from './dto/curate-artwork.dto';
 import { UpdateArtworkDto } from './dto/update-artwork.dto';
+import { UpdateTagDto } from './dto/update-tag.dto';
 
 @ApiTags('Artworks')
 @Controller('artworks')
@@ -87,6 +89,39 @@ export class ArtworksController {
   @ApiResponse({ status: 200, description: 'Daftar tag' })
   findAllTags() {
     return this.artworksService.findAllTags();
+  }
+
+  @Post('tags')
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Menambahkan master tag baru (Admin)' })
+  @ApiResponse({ status: 201, description: 'Tag berhasil dibuat' })
+  @ApiResponse({ status: 409, description: 'Tag sudah terdaftar' })
+  createTag(@Body() dto: CreateTagDto) {
+    return this.artworksService.createTag(dto);
+  }
+
+  @Patch('tags/:id')
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Mengubah nama master tag (Admin)' })
+  @ApiResponse({ status: 200, description: 'Tag berhasil diperbarui' })
+  @ApiResponse({ status: 404, description: 'Tag tidak ditemukan' })
+  updateTag(@Param('id') id: string, @Body() dto: UpdateTagDto) {
+    return this.artworksService.updateTag(id, dto);
+  }
+
+  @Delete('tags/:id')
+  @UseGuards(JwtAccessGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Menghapus master tag (Admin)' })
+  @ApiResponse({ status: 200, description: 'Tag berhasil dihapus' })
+  @ApiResponse({ status: 404, description: 'Tag tidak ditemukan' })
+  deleteTag(@Param('id') id: string) {
+    return this.artworksService.deleteTag(id);
   }
 
   // ─── Curator & Admin Routes ──────────────────────────────────────────────────

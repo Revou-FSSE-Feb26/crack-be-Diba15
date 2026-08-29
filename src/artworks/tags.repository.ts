@@ -40,7 +40,71 @@ export class TagsRepository implements TagsRepositoryInterface {
 
   async findAllTags() {
     return this.prisma.tag.findMany({
+      include: {
+        _count: {
+          select: {
+            artworks: true,
+          },
+        },
+      },
       orderBy: { tagName: 'asc' },
+    });
+  }
+
+  async findTagById(id: string) {
+    return this.prisma.tag.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            artworks: true,
+          },
+        },
+      },
+    });
+  }
+
+  async findTagByName(name: string) {
+    return this.prisma.tag.findUnique({
+      where: { tagName: name },
+    });
+  }
+
+  async createTag(name: string) {
+    return this.prisma.tag.create({
+      data: { tagName: name },
+      include: {
+        _count: {
+          select: {
+            artworks: true,
+          },
+        },
+      },
+    });
+  }
+
+  async updateTag(id: string, name: string) {
+    return this.prisma.tag.update({
+      where: { id },
+      data: { tagName: name },
+      include: {
+        _count: {
+          select: {
+            artworks: true,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteTag(id: string) {
+    return this.prisma.$transaction(async (tx) => {
+      await tx.artworkTag.deleteMany({
+        where: { tagId: id },
+      });
+      return tx.tag.delete({
+        where: { id },
+      });
     });
   }
 }

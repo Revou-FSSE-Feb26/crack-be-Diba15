@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,8 +8,10 @@ import {
 import { ArtistsRepository } from './artists.repository';
 import { ArtworksRepository } from './artworks.repository';
 import type { CreateArtworkDto } from './dto/create-artwork.dto';
+import type { CreateTagDto } from './dto/create-tag.dto';
 import type { CurateArtworkDto } from './dto/curate-artwork.dto';
 import type { UpdateArtworkDto } from './dto/update-artwork.dto';
+import type { UpdateTagDto } from './dto/update-tag.dto';
 import { TagsRepository } from './tags.repository';
 
 @Injectable()
@@ -210,7 +213,61 @@ export class ArtworksService {
     return tags.map((t) => ({
       id: t.id,
       tag_name: t.tagName,
+      count: t._count?.artworks ?? 0,
     }));
+  }
+
+  async createTag(dto: CreateTagDto) {
+    const normalized = dto.tagName.trim().toLowerCase();
+    if (!normalized) {
+      throw new BadRequestException('Nama tag tidak boleh kosong.');
+    }
+
+    const existing = await this.tagsRepository.findTagByName(normalized);
+    if (existing) {
+      throw new ConflictException(`Tag "${normalized}" sudah terdaftar.`);
+    }
+
+    const tag = await this.tagsRepository.createTag(normalized);
+    return {
+      id: tag.id,
+      tag_name: tag.tagName,
+      count: tag._count?.artworks ?? 0,
+    };
+  }
+
+  async updateTag(id: string, dto: UpdateTagDto) {
+    const tag = await this.tagsRepository.findTagById(id);
+    if (!tag) {
+      throw new NotFoundException('Tag tidak ditemukan.');
+    }
+
+    const normalized = dto.tagName.trim().toLowerCase();
+    if (!normalized) {
+      throw new BadRequestException('Nama tag tidak boleh kosong.');
+    }
+
+    const existing = await this.tagsRepository.findTagByName(normalized);
+    if (existing && existing.id !== id) {
+      throw new ConflictException(`Tag "${normalized}" sudah digunakan oleh tag lain.`);
+    }
+
+    const updated = await this.tagsRepository.updateTag(id, normalized);
+    return {
+      id: updated.id,
+      tag_name: updated.tagName,
+      count: updated._count?.artworks ?? 0,
+    };
+  }
+
+  async deleteTag(id: string) {
+    const tag = await this.tagsRepository.findTagById(id);
+    if (!tag) {
+      throw new NotFoundException('Tag tidak ditemukan.');
+    }
+
+    await this.tagsRepository.deleteTag(id);
+    return { message: `Tag "${tag.tagName}" berhasil dihapus.` };
   }
 
   async findArtistById(id: string) {

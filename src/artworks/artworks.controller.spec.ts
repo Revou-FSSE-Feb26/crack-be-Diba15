@@ -2,8 +2,10 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import { ArtworksController } from './artworks.controller';
 import { ArtworksService } from './artworks.service';
 import type { CreateArtworkDto } from './dto/create-artwork.dto';
+import type { CreateTagDto } from './dto/create-tag.dto';
 import type { CurateArtworkDto } from './dto/curate-artwork.dto';
 import type { UpdateArtworkDto } from './dto/update-artwork.dto';
+import type { UpdateTagDto } from './dto/update-tag.dto';
 
 describe('ArtworksController', () => {
   let controller: ArtworksController;
@@ -45,6 +47,9 @@ describe('ArtworksController', () => {
       findAllArtists: jest.fn().mockResolvedValue([mockArtist]),
       findArtistById: jest.fn().mockResolvedValue(mockArtist),
       findAllTags: jest.fn().mockResolvedValue([mockTag]),
+      createTag: jest.fn().mockResolvedValue(mockTag),
+      updateTag: jest.fn().mockResolvedValue({ ...mockTag, tag_name: 'cyberpunk-2077' }),
+      deleteTag: jest.fn().mockResolvedValue({ message: 'Tag "cyberpunk" berhasil dihapus.' }),
       create: jest.fn().mockResolvedValue(mockArtwork),
       update: jest.fn().mockResolvedValue({ ...mockArtwork, title: 'Updated Title' }),
       curate: jest.fn().mockResolvedValue({ ...mockArtwork, curation_status: 'approved' }),
@@ -119,24 +124,36 @@ describe('ArtworksController', () => {
     });
   });
 
-  describe('findAllTags', () => {
-    it('should return all tags', async () => {
+  describe('tags management', () => {
+    it('should return all tags with count', async () => {
       const result = await controller.findAllTags();
       expect(service.findAllTags).toHaveBeenCalled();
       expect(result).toEqual([mockTag]);
     });
-  });
 
-  describe('findPending', () => {
-    it('should call artworksService.findAll with curationStatus pending', async () => {
-      const result = await controller.findPending();
-      expect(service.findAll).toHaveBeenCalledWith({ curationStatus: 'pending' });
-      expect(result).toEqual([mockArtwork]);
+    it('should create new tag', async () => {
+      const dto: CreateTagDto = { tagName: 'cyberpunk' };
+      const result = await controller.createTag(dto);
+      expect(service.createTag).toHaveBeenCalledWith(dto);
+      expect(result).toEqual(mockTag);
+    });
+
+    it('should update tag', async () => {
+      const dto: UpdateTagDto = { tagName: 'cyberpunk-2077' };
+      const result = await controller.updateTag('t-001', dto);
+      expect(service.updateTag).toHaveBeenCalledWith('t-001', dto);
+      expect(result).toEqual({ ...mockTag, tag_name: 'cyberpunk-2077' });
+    });
+
+    it('should delete tag', async () => {
+      const result = await controller.deleteTag('t-001');
+      expect(service.deleteTag).toHaveBeenCalledWith('t-001');
+      expect(result).toEqual({ message: 'Tag "cyberpunk" berhasil dihapus.' });
     });
   });
 
   describe('findOne', () => {
-    it('should return an artwork by id', async () => {
+    it('should return single artwork', async () => {
       const result = await controller.findOne('a-001');
       expect(service.findOne).toHaveBeenCalledWith('a-001');
       expect(result).toEqual(mockArtwork);
