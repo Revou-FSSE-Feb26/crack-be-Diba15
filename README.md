@@ -146,7 +146,7 @@ NODE_ENV=development
 ### 4. Migrasi & Seeding Database
 ```bash
 # Sinkronkan skema Prisma ke database
-pnpm prisma db push
+pnpm prisma migrate dev
 
 # Jalankan data awal / mock data seeding
 pnpm prisma db seed
