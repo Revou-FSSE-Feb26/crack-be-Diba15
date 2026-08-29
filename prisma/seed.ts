@@ -172,7 +172,13 @@ async function main() {
   for (const p of profilesData) {
     await prisma.profile.upsert({
       where: { id: p.id },
-      update: {},
+      update: {
+        isVerified: p.isVerified,
+        isOpenForCommission: p.isOpenForCommission,
+        approvedPortfolioCount: p.approvedPortfolioCount,
+        basePriceIdr: p.basePriceIdr,
+        bio: p.bio,
+      },
       create: p,
     });
   }

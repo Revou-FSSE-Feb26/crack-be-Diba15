@@ -1,0 +1,1483 @@
+{
+	"info": {
+		"_postman_id": "trubrush-api-collection-v2",
+		"name": "TruBrush API Collection (Anti-AI & Escrow Platform)",
+		"description": "Koleksi lengkap REST API TruBrush v1.0 yang dirancang 100% AMAN dan OTOMATIS untuk dijalankan sekaligus menggunakan Postman Collection Runner. Menggunakan dynamic token & ID chaining dari pembuatan data baru hingga siklus penyelesaian tanpa merusak seed database.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01. Authentication & Sessions",
+			"description": "Endpoint otentikasi, pendaftaran akun, dan manajemen sesi login.",
+			"item": [
+				{
+					"name": "1.1 Login Admin (Auto Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"Response contains Access Token\", function () {",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.environment.set('admin_token', jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.2 Login Curator (Auto Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"Response contains Access Token\", function () {",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.environment.set('curator_token', jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{curator_email}}\",\n  \"password\": \"{{curator_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.3 Login Artist (Auto Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"Response contains Access Token\", function () {",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.environment.set('artist_token', jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{artist_email}}\",\n  \"password\": \"{{artist_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.4 Login Client (Auto Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var jsonData = pm.response.json();",
+									"pm.test(\"Response contains Access Token\", function () {",
+									"    pm.expect(jsonData).to.have.property('accessToken');",
+									"    pm.environment.set('client_token', jsonData.accessToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{client_email}}\",\n  \"password\": \"{{client_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.5 Register New Artist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 200 OK\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Seniman Baru Postman\",\n  \"email\": \"artist_test_{{$timestamp}}@example.com\",\n  \"password\": \"secret123\",\n  \"role\": \"artist\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "1.6 Register New Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 200 OK\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Klien Baru Postman\",\n  \"email\": \"client_test_{{$timestamp}}@example.com\",\n  \"password\": \"secret123\",\n  \"role\": \"client\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "1.7 Get My Profile (/auth/me)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response has user identity properties\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "me"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "02. Users & Wallet Management",
+			"description": "Endpoint manajemen pengguna, top up saldo dompet, dan penarikan dana seniman.",
+			"item": [
+				{
+					"name": "2.1 Get All Users (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Response is an array of users\", function () {",
+									"    var data = pm.response.json();",
+									"    pm.expect(data).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						}
+					}
+				},
+				{
+					"name": "2.2 Get User By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/users/{{artist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["users", "{{artist_id}}"]
+						}
+					}
+				},
+				{
+					"name": "2.3 Top Up Saldo Dompet (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK or 201 Created\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 1000000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/topup",
+							"host": ["{{base_url}}"],
+							"path": ["users", "topup"]
+						}
+					}
+				},
+				{
+					"name": "2.4 Withdraw Dana Artis (Min 100k)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK or 400 Bad Request (if balance < 100k)\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100000,\n  \"bankName\": \"BCA\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"Ari Ramadan\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/withdraw",
+							"host": ["{{base_url}}"],
+							"path": ["users", "withdraw"]
+						}
+					}
+				},
+				{
+					"name": "2.5 Create New Curator (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 200 OK\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Kurator Postman\",\n  \"email\": \"curator_postman_{{$timestamp}}@trubrush.com\",\n  \"password\": \"curator123\",\n  \"role\": \"curator\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "03. Artworks & Anti-AI Curation",
+			"description": "Endpoint unggah karya, feed publik, antrean kurasi anti-AI, dan master tag.",
+			"item": [
+				{
+					"name": "3.1 Post Artwork with WIP Proof (Artist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data && data.id) {",
+									"    pm.environment.set('artwork_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Lukisan Digital Nusantara #{{$timestamp}}\",\n  \"description\": \"Karya seni digital manual bertema kebudayaan Indonesia dengan bukti layer WIP.\",\n  \"imagesUrl\": [\n    \"https://picsum.photos/seed/artwork-postman/800/600\"\n  ],\n  \"wipProofUrl\": \"https://picsum.photos/seed/artwork-wip-postman/800/600\",\n  \"uploadType\": \"original\",\n  \"tagNames\": [\"digital_art\", \"nusantara\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/artworks",
+							"host": ["{{base_url}}"],
+							"path": ["artworks"]
+						}
+					}
+				},
+				{
+					"name": "3.2 Get Public Feed Artworks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/artworks?page=1&limit=6",
+							"host": ["{{base_url}}"],
+							"path": ["artworks"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "6" }
+							]
+						}
+					}
+				},
+				{
+					"name": "3.3 Get Pending Curation Artworks (Curator/Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{curator_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/artworks/pending",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "pending"]
+						}
+					}
+				},
+				{
+					"name": "3.4 Get Artwork Detail By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/artworks/{{artwork_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "{{artwork_id}}"]
+						}
+					}
+				},
+				{
+					"name": "3.5 Curate Artwork - Approve (Curator)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{curator_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"curationStatus\": \"approved\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/artworks/{{artwork_id}}/curate",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "{{artwork_id}}", "curate"]
+						}
+					}
+				},
+				{
+					"name": "3.6 Takedown Artwork (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isVisibleOnFeed\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/artworks/{{artwork_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "{{artwork_id}}"]
+						}
+					}
+				},
+				{
+					"name": "3.7 Restore Artwork (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isVisibleOnFeed\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/artworks/{{artwork_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "{{artwork_id}}"]
+						}
+					}
+				},
+				{
+					"name": "3.8 Get Master Tags List",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/artworks/tags",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "tags"]
+						}
+					}
+				},
+				{
+					"name": "3.9 Create Master Tag (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 200 OK\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data && data.id) {",
+									"    pm.environment.set('tag_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tagName\": \"tag_test_{{$timestamp}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/artworks/tags",
+							"host": ["{{base_url}}"],
+							"path": ["artworks", "tags"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "04. Commissions & Escrow Flow",
+			"description": "Endpoint pemesanan komisi, pembayaran escrow, upload deliverable sketsa, dan rilis dana 95/5%.",
+			"item": [
+				{
+					"name": "4.1 Order Commission (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data && data.id) {",
+									"    pm.environment.set('commission_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"artistsId\": \"{{artist_id}}\",\n  \"commissionTitle\": \"Desain Karakter Fantasi Edisi Postman #{{$timestamp}}\",\n  \"description\": \"Karakter pendekar nusantara dengan palet warna emas dan ornamen batik.\",\n  \"price\": 500000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions",
+							"host": ["{{base_url}}"],
+							"path": ["commissions"]
+						}
+					}
+				},
+				{
+					"name": "4.2 Get My Commissions List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/commissions",
+							"host": ["{{base_url}}"],
+							"path": ["commissions"]
+						}
+					}
+				},
+				{
+					"name": "4.3 Respond Commission - Accept (Artist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"in_progress\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/respond",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "respond"]
+						}
+					}
+				},
+				{
+					"name": "4.4 Pay Commission to Escrow (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/pay",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "pay"]
+						}
+					}
+				},
+				{
+					"name": "4.5 Upload Sketch Progress (Artist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sketch_url\": \"https://picsum.photos/seed/sketch-postman/800/600\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/progress",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "progress"]
+						}
+					}
+				},
+				{
+					"name": "4.6 Approve Sketch (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"step\": \"sketch\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/approve",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "approve"]
+						}
+					}
+				},
+				{
+					"name": "4.7 Upload Final Artwork (Artist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"final_artwork_url\": \"https://picsum.photos/seed/final-artwork-postman/1200/900\",\n  \"final_file_url\": \"https://picsum.photos/seed/master-zip-postman/master.zip\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/progress",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "progress"]
+						}
+					}
+				},
+				{
+					"name": "4.8 Approve Final Artwork & Release Escrow (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"step\": \"final\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/approve",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "approve"]
+						}
+					}
+				},
+				{
+					"name": "4.9 Complete Commission (Artist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "PATCH",
+						"url": {
+							"raw": "{{base_url}}/commissions/{{commission_id}}/complete",
+							"host": ["{{base_url}}"],
+							"path": ["commissions", "{{commission_id}}", "complete"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "05. Disputes & Mediasi",
+			"description": "Endpoint pelaporan sengketa komisi dan mediasi pengembalian dana escrow.",
+			"item": [
+				{
+					"name": "5.1 File Commission Dispute (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 400 Bad Request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data && data.id) {",
+									"    pm.environment.set('dispute_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"commissionId\": \"c-002\",\n  \"reason\": \"Seniman tidak memberikan kabar selama lebih dari 7 hari setelah revisi diajukan.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/disputes",
+							"host": ["{{base_url}}"],
+							"path": ["disputes"]
+						}
+					}
+				},
+				{
+					"name": "5.2 Get All Disputes List (Admin/Curator)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/disputes",
+							"host": ["{{base_url}}"],
+							"path": ["disputes"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "06. Reports & Moderasi Aduan",
+			"description": "Endpoint pelaporan karya bermasalah dan penindakan strike oleh kurator.",
+			"item": [
+				{
+					"name": "6.1 Report Artwork (Client)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 200 OK\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data && data.id) {",
+									"    pm.environment.set('report_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"artworkId\": \"{{artwork_id}}\",\n  \"reason\": \"Karya terindikasi hasil generasi AI yang tidak dideklarasikan pada deskripsi.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/reports",
+							"host": ["{{base_url}}"],
+							"path": ["reports"]
+						}
+					}
+				},
+				{
+					"name": "6.2 Get Reports List (Curator/Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{curator_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/reports",
+							"host": ["{{base_url}}"],
+							"path": ["reports"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "07. Appeals & Banding Akun Seniman",
+			"description": "Endpoint pengajuan banding atas pembekuan akun seniman dan resolusi admin.",
+			"item": [
+				{
+					"name": "7.1 File Account Appeal (Artist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201 Created or 400 Bad Request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
+									"});",
+									"var data = pm.response.json();",
+									"if (data && data.id) {",
+									"    pm.environment.set('appeal_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reason\": \"Saya melampirkan berkas PSD mentah berisi 30 layer terpisah dan rekaman video proses pembuatan dari kanvas kosong untuk membuktikan karya asli manual.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/appeals",
+							"host": ["{{base_url}}"],
+							"path": ["appeals"]
+						}
+					}
+				},
+				{
+					"name": "7.2 Get My Appeals (Artist)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{artist_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/appeals/my",
+							"host": ["{{base_url}}"],
+							"path": ["appeals", "my"]
+						}
+					}
+				},
+				{
+					"name": "7.3 Get All Appeals (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/appeals",
+							"host": ["{{base_url}}"],
+							"path": ["appeals"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "08. Financial Reports & Buku Kas",
+			"description": "Endpoint audit buku kas platform, agregasi GMV, saldo escrow, dan potongan fee platform 5%.",
+			"item": [
+				{
+					"name": "8.1 Get My Personal Transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/transactions/my",
+							"host": ["{{base_url}}"],
+							"path": ["transactions", "my"]
+						}
+					}
+				},
+				{
+					"name": "8.2 Get Global Financial Ledger (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/transactions",
+							"host": ["{{base_url}}"],
+							"path": ["transactions"]
+						}
+					}
+				},
+				{
+					"name": "8.3 Get Executive Financial Summary (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Summary contains GMV, Escrow, and Platform Fee\", function () {",
+									"    pm.expect(data).to.have.property('total_gmv');",
+									"    pm.expect(data).to.have.property('escrow_balance');",
+									"    pm.expect(data).to.have.property('platform_fee_revenue');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/transactions/summary",
+							"host": ["{{base_url}}"],
+							"path": ["transactions", "summary"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "09. Curator Performance & SLA",
+			"description": "Endpoint analitik performa kurator, evaluasi rata-rata durasi SLA respons, dan rasio kelolosan anti-AI.",
+			"item": [
+				{
+					"name": "9.1 Get Curator Performance Metrics (Curator/Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"var data = pm.response.json();",
+									"pm.test(\"Response contains summary and curators array\", function () {",
+									"    pm.expect(data).to.have.property('summary');",
+									"    pm.expect(data).to.have.property('curators');",
+									"    pm.expect(data.summary).to.have.property('average_response_time_minutes');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/curator-performance",
+							"host": ["{{base_url}}"],
+							"path": ["curator-performance"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "10. Audit Logs & Social",
+			"description": "Endpoint rekam jejak audit log kronologis dan interaksi sosial (follow, favorit).",
+			"item": [
+				{
+					"name": "10.1 Get Chronological Audit Logs (Admin Only)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/audit-logs",
+							"host": ["{{base_url}}"],
+							"path": ["audit-logs"]
+						}
+					}
+				},
+				{
+					"name": "10.2 Follow Artist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/social/follow/{{artist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["social", "follow", "{{artist_id}}"]
+						}
+					}
+				},
+				{
+					"name": "10.3 Unfollow Artist (Toggle)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/social/follow/{{artist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["social", "follow", "{{artist_id}}"]
+						}
+					}
+				},
+				{
+					"name": "10.4 Favorite Artwork",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/social/favorite/{{artwork_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["social", "favorite", "{{artwork_id}}"]
+						}
+					}
+				},
+				{
+					"name": "10.5 Unfavorite Artwork (Toggle)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/social/favorite/{{artwork_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["social", "favorite", "{{artwork_id}}"]
+						}
+					}
+				},
+				{
+					"name": "10.6 Get My Favorite Artworks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 OK\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [{ "key": "token", "value": "{{client_token}}", "type": "string" }]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/social/favorite",
+							"host": ["{{base_url}}"],
+							"path": ["social", "favorite"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

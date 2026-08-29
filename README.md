@@ -182,3 +182,4 @@ pnpm run build
 
 - 📄 [**Alur Bisnis & Matriks RBAC (BUSINESS_PROCESS.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/BUSINESS_PROCESS.md)
 - 📐 [**Dokumentasi Logika & Formula Bisnis (LOGIC_DOCS.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/LOGIC_DOCS.md)
+- 📮 [**Panduan & Koleksi Postman API (docs/postman/README.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/postman/README.md)
