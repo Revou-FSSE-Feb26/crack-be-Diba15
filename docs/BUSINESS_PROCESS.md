@@ -73,7 +73,7 @@ graph TD
 | Kelola Akun & Permohonan Banding (`/dashboard/manage-users`)| ❌ | ❌ | ❌ | ❌ | ✅ |
 | Kelola Master Tag & Takedown Katalog (`/dashboard/manage-tags`)| ❌ | ❌ | ❌ | ❌ | ✅ |
 | Audit Finansial & Buku Kas (`/dashboard/financial-reports`)| ❌ | ❌ | ❌ | ❌ | ✅ |
-| Evaluasi Kinerja & Metrik SLA Kurator (`/dashboard/curator-performance`)| ❌ | ❌ | ❌ | ✅ | ✅ |
+| Evaluasi Kinerja & Metrik SLA Kurator (`/dashboard/curator-performance`)| ❌ | ❌ | ❌ | ❌ | ✅ |
 | Rekam Jejak Log Audit Kronologis (`/dashboard/audit-logs`)| ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---

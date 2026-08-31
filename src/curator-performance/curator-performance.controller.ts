@@ -13,10 +13,10 @@ export class CuratorPerformanceController {
 
   @Get()
   @UseGuards(JwtAccessGuard, RolesGuard)
-  @Roles('admin', 'curator')
+  @Roles('admin')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
-    summary: 'Mendapatkan laporan metrik kinerja kurasi & SLA moderator (Admin & Curator)',
+    summary: 'Mendapatkan laporan metrik kinerja kurasi & SLA moderator (Admin Only)',
   })
   @ApiResponse({
     status: 200,

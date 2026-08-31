@@ -1270,7 +1270,7 @@
 			"description": "Endpoint analitik performa kurator, evaluasi rata-rata durasi SLA respons, dan rasio kelolosan anti-AI.",
 			"item": [
 				{
-					"name": "9.1 Get Curator Performance Metrics (Curator/Admin)",
+					"name": "9.1 Get Curator Performance Metrics (Admin Only)",
 					"event": [
 						{
 							"listen": "test",

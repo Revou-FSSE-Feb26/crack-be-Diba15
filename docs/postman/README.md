@@ -2,6 +2,14 @@
 
 Folder ini berisi berkas **Postman Collection (v2.1.0)** dan **Postman Environment** resmi untuk pengujian seluruh *endpoints* REST API platform **TruBrush**.
 
+> [!WARNING]
+> **Peringatan Status Data (*Data State*) Sebelum Menjalankan Collection Runner:**
+> Jika Anda menjalankan pengujian otomatis (*Collection Runner*) berulang kali, pastikan database di-*reset* ke kondisi awal terlebih dahulu.
+> Jalankan perintah berikut di terminal backend sebelum memulai *test run*:
+> ```bash
+> pnpm prisma db seed
+> ```
+
 ---
 
 ## 📂 Daftar Berkas
