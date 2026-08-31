@@ -148,7 +148,7 @@ async function main() {
         'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
       bio: 'Ilustrator cat air berbasis di Jakarta. Spesialis lanskap urban dan alam.',
       isVerified: true,
-      approvedPortfolioCount: 12,
+      approvedPortfolioCount: 5,
       isOpenForCommission: true,
       basePriceIdr: 250000,
       strikeCount: 0,
@@ -160,7 +160,7 @@ async function main() {
         'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
       bio: 'Character designer & illustrator. Suka Sci-Fi dan fantasy. No AI, ever.',
       isVerified: true,
-      approvedPortfolioCount: 8,
+      approvedPortfolioCount: 5,
       isOpenForCommission: true,
       basePriceIdr: 350000,
       strikeCount: 0,
@@ -172,7 +172,7 @@ async function main() {
         'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
       bio: 'Ink artist. Menggambar dengan tangan sejak 2015. Penggemar berat folklore.',
       isVerified: true,
-      approvedPortfolioCount: 20,
+      approvedPortfolioCount: 5,
       isOpenForCommission: false,
       basePriceIdr: 200000,
       strikeCount: 0,
@@ -184,7 +184,7 @@ async function main() {
         'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
       bio: 'Komikus & cover artist. Webtoon lokal enthusiast.',
       isVerified: false,
-      approvedPortfolioCount: 3,
+      approvedPortfolioCount: 2,
       isOpenForCommission: true,
       basePriceIdr: 175000,
       strikeCount: 1,
@@ -293,6 +293,7 @@ async function main() {
   // ─── 6. BUAT ARTWORKS (Upsert) ───
   console.log('🌱 Menyemaikan karya seni (Artworks)...');
   const artworksData = [
+    // --- Ari Ramadan (u-001: 5 Approved) ---
     {
       id: 'a-001',
       artistsId: 'u-001',
@@ -325,6 +326,54 @@ async function main() {
       isVisibleOnFeed: true,
       createdAt: new Date('2026-08-05T14:20:00Z'),
     },
+    {
+      id: 'a-008',
+      artistsId: 'u-001',
+      title: 'Hujan di Borobudur',
+      description:
+        'Studi suasana Candi Borobudur saat gerimis sore. Menggunakan kuas Cina dan cat air Winsor & Newton.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-23T15:30:00Z'),
+    },
+    {
+      id: 'a-013',
+      artistsId: 'u-001',
+      title: 'Harmoni Danau Toba',
+      description: 'Lanskap perairan Danau Toba di sore hari dengan sentuhan cat air transparan.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1579783901586-d88db74b4fe4?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-24T09:00:00Z'),
+    },
+    {
+      id: 'a-014',
+      artistsId: 'u-001',
+      title: 'Pelabuhan Sunda Kelapa',
+      description: 'Perahu pinisi tradisional yang bersandar di dermaga bersejarah Jakarta Utara.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-25T14:30:00Z'),
+    },
+
+    // --- Nadia Suryani (u-002: 5 Approved + 1 Pending Fanart) ---
     {
       id: 'a-003',
       artistsId: 'u-002',
@@ -359,6 +408,68 @@ async function main() {
       createdAt: new Date('2026-08-15T16:00:00Z'),
     },
     {
+      id: 'a-010',
+      artistsId: 'u-002',
+      title: 'Cyber Valkyrie',
+      description: 'Desain karakter mecha wanita dengan palet pencahayaan neon gradien ungu-sian.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1608889175123-8ee362201f81?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-16T11:20:00Z'),
+    },
+    {
+      id: 'a-011',
+      artistsId: 'u-002',
+      title: 'Mecha Horizon',
+      description: 'Studi siluet robot tempur berat di medan tempur distopia.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1618172193763-c511deb635ca?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-17T15:40:00Z'),
+    },
+    {
+      id: 'a-012',
+      artistsId: 'u-002',
+      title: 'Galactic Odyssey',
+      description: 'Artwork eksplorasi stasiun luar angkasa modular di orbit planet baru.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1578301978018-3005759f48f7?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1582201942988-13e60e4556ee?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-18T09:10:00Z'),
+    },
+    {
+      id: 'a-009',
+      artistsId: 'u-002',
+      title: 'Guardian of the Stars (Fanart)',
+      description:
+        'Fan art karakter dari franchise populer, digambar manual dengan referensi resmi.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl: null,
+      uploadType: 'fanart' as const,
+      curationStatus: 'pending' as const,
+      isVisibleOnFeed: false,
+      createdAt: new Date('2026-08-24T11:15:00Z'),
+    },
+
+    // --- Budi Laksono (u-003: 5 Approved) ---
+    {
       id: 'a-005',
       artistsId: 'u-003',
       title: 'Forest Spirit — Ink Series #3',
@@ -373,21 +484,6 @@ async function main() {
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
       createdAt: new Date('2026-08-18T11:00:00Z'),
-    },
-    {
-      id: 'a-006',
-      artistsId: 'u-004',
-      title: 'Pasar Malam — Webtoon Cover',
-      description: 'Cover episode perdana webtoon lokal bertema festival rakyat malam hari.',
-      imagesUrl: [
-        'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
-      ],
-      wipProofUrl:
-        'https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?auto=format&fit=crop&w=1000&q=80',
-      uploadType: 'original' as const,
-      curationStatus: 'approved' as const,
-      isVisibleOnFeed: true,
-      createdAt: new Date('2026-08-20T13:00:00Z'),
     },
     {
       id: 'a-007',
@@ -406,11 +502,72 @@ async function main() {
       createdAt: new Date('2026-08-22T08:45:00Z'),
     },
     {
-      id: 'a-008',
-      artistsId: 'u-001',
-      title: 'Hujan di Borobudur',
-      description:
-        'Studi suasana Candi Borobudur saat gerimis sore. Menggunakan kuas Cina dan cat air Winsor & Newton.',
+      id: 'a-015',
+      artistsId: 'u-003',
+      title: 'Hikayat Naga Pasundan',
+      description: 'Ilustrasi arsir tradisional makhluk mitologi naga tanah Sunda.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1578925518470-4def7a0f08bb?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-23T10:00:00Z'),
+    },
+    {
+      id: 'a-016',
+      artistsId: 'u-003',
+      title: 'Tarian Topeng Cirebon',
+      description: 'Karya seni tinta manual menampilkan dinamisme penari topeng kelana.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1579783483458-83d02161294e?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-24T16:00:00Z'),
+    },
+    {
+      id: 'a-017',
+      artistsId: 'u-003',
+      title: 'Siluet Pohon Beringin',
+      description: 'Studi tekstur akar gantung pohon beringin tua dengan tinta hitam pekat.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1584727638096-042c45049ebe?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-25T11:00:00Z'),
+    },
+
+    // --- Rina Pertiwi (u-004: 2 Approved) ---
+    {
+      id: 'a-006',
+      artistsId: 'u-004',
+      title: 'Pasar Malam — Webtoon Cover',
+      description: 'Cover episode perdana webtoon lokal bertema festival rakyat malam hari.',
+      imagesUrl: [
+        'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1000&q=80',
+      ],
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
+      isVisibleOnFeed: true,
+      createdAt: new Date('2026-08-20T13:00:00Z'),
+    },
+    {
+      id: 'a-018',
+      artistsId: 'u-004',
+      title: 'Kafe Sudut Jalan',
+      description: 'Ilustrasi latar belakang kafe santai bergaya manga slice-of-life.',
       imagesUrl: [
         'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1000&q=80',
       ],
@@ -419,22 +576,24 @@ async function main() {
       uploadType: 'original' as const,
       curationStatus: 'approved' as const,
       isVisibleOnFeed: true,
-      createdAt: new Date('2026-08-23T15:30:00Z'),
+      createdAt: new Date('2026-08-21T10:00:00Z'),
     },
+
+    // --- Fajar Nugroho (u-009: 1 Approved - Suspended) ---
     {
-      id: 'a-009',
-      artistsId: 'u-002',
-      title: 'Guardian of the Stars (Fanart)',
-      description:
-        'Fan art karakter dari franchise populer, digambar manual dengan referensi resmi.',
+      id: 'a-019',
+      artistsId: 'u-009',
+      title: 'Sketsa Karakter Lawas',
+      description: 'Sketsa konsep karakter masa lalu sebelum akun dibekukan.',
       imagesUrl: [
         'https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?auto=format&fit=crop&w=1000&q=80',
       ],
-      wipProofUrl: null,
-      uploadType: 'fanart' as const,
-      curationStatus: 'pending' as const,
+      wipProofUrl:
+        'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1000&q=80',
+      uploadType: 'original' as const,
+      curationStatus: 'approved' as const,
       isVisibleOnFeed: false,
-      createdAt: new Date('2026-08-24T11:15:00Z'),
+      createdAt: new Date('2026-08-10T10:00:00Z'),
     },
   ];
 
@@ -462,22 +621,40 @@ async function main() {
     { artworkId: 'a-001', tagId: 't-003' },
     { artworkId: 'a-002', tagId: 't-001' },
     { artworkId: 'a-002', tagId: 't-003' },
+    { artworkId: 'a-008', tagId: 't-003' },
+    { artworkId: 'a-008', tagId: 't-006' },
+    { artworkId: 'a-013', tagId: 't-001' },
+    { artworkId: 'a-013', tagId: 't-002' },
+    { artworkId: 'a-014', tagId: 't-002' },
+    { artworkId: 'a-014', tagId: 't-003' },
     { artworkId: 'a-003', tagId: 't-004' },
     { artworkId: 'a-003', tagId: 't-005' },
     { artworkId: 'a-003', tagId: 't-006' },
     { artworkId: 'a-004', tagId: 't-004' },
     { artworkId: 'a-004', tagId: 't-005' },
     { artworkId: 'a-004', tagId: 't-006' },
-    { artworkId: 'a-005', tagId: 't-007' },
-    { artworkId: 'a-005', tagId: 't-008' },
-    { artworkId: 'a-006', tagId: 't-009' },
-    { artworkId: 'a-006', tagId: 't-010' },
-    { artworkId: 'a-007', tagId: 't-008' },
-    { artworkId: 'a-007', tagId: 't-006' },
-    { artworkId: 'a-008', tagId: 't-003' },
-    { artworkId: 'a-008', tagId: 't-006' },
+    { artworkId: 'a-010', tagId: 't-004' },
+    { artworkId: 'a-010', tagId: 't-005' },
+    { artworkId: 'a-011', tagId: 't-005' },
+    { artworkId: 'a-011', tagId: 't-006' },
+    { artworkId: 'a-012', tagId: 't-005' },
     { artworkId: 'a-009', tagId: 't-004' },
     { artworkId: 'a-009', tagId: 't-005' },
+    { artworkId: 'a-005', tagId: 't-007' },
+    { artworkId: 'a-005', tagId: 't-008' },
+    { artworkId: 'a-007', tagId: 't-008' },
+    { artworkId: 'a-007', tagId: 't-006' },
+    { artworkId: 'a-015', tagId: 't-007' },
+    { artworkId: 'a-015', tagId: 't-008' },
+    { artworkId: 'a-016', tagId: 't-007' },
+    { artworkId: 'a-016', tagId: 't-006' },
+    { artworkId: 'a-017', tagId: 't-007' },
+    { artworkId: 'a-017', tagId: 't-008' },
+    { artworkId: 'a-006', tagId: 't-009' },
+    { artworkId: 'a-006', tagId: 't-010' },
+    { artworkId: 'a-018', tagId: 't-009' },
+    { artworkId: 'a-018', tagId: 't-010' },
+    { artworkId: 'a-019', tagId: 't-004' },
   ];
 
   for (const artTag of artworkTagsData) {
