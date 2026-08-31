@@ -17,6 +17,7 @@ jobs:
 
     env:
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/trubrush_test"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/trubrush_test"
       JWT_ACCESS_SECRET: "ci_jwt_access_secret_key_12345"
       JWT_REFRESH_SECRET: "ci_jwt_refresh_secret_key_12345"
       RESEND_API_KEY: "re_mock_ci_api_key_123"
