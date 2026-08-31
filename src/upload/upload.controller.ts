@@ -10,14 +10,21 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
+import { CommissionsRepository } from '../commissions/commissions.repository';
 import { UploadService } from './upload.service';
 
+@ApiTags('Upload')
+@ApiBearerAuth('JWT-auth')
 @Controller('upload')
 @UseGuards(JwtAccessGuard)
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly commissionsRepository: CommissionsRepository,
+  ) {}
 
   // ─── Single File Upload (POST /api/upload) — KHUSUS AVATAR ──────────────────
   @Post()
@@ -132,8 +139,30 @@ export class UploadController {
   }
 
   /**
+   * POST /api/upload/commissions/:commissionId/sketch
+   * Upload sketsa / video WIP proof ke folder `commissions/:commissionId/sketch`.
+   */
+  @Post('commissions/:commissionId/sketch')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCommissionSketch(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('commissionId') commissionId: string,
+  ) {
+    if (!file) {
+      throw new BadRequestException('File sketsa/WIP proof wajib diunggah.');
+    }
+
+    const maxFileSize = 30 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      throw new BadRequestException('Ukuran file sketsa/WIP maksimal 30MB.');
+    }
+
+    return this.uploadService.handleCommissionSketchUpload(commissionId, file);
+  }
+
+  /**
    * POST /api/upload/commissions/:commissionId/preview
-   * Upload sketsa / preview komisi ke folder `commissions/:commissionId/preview`.
+   * Upload preview hasil akhir komisi ke folder `commissions/:commissionId/preview`.
    */
   @Post('commissions/:commissionId/preview')
   @UseInterceptors(FileInterceptor('file'))
@@ -142,7 +171,7 @@ export class UploadController {
     @Param('commissionId') commissionId: string,
   ) {
     if (!file) {
-      throw new BadRequestException('File preview/sketsa wajib diunggah.');
+      throw new BadRequestException('File preview hasil akhir wajib diunggah.');
     }
 
     const maxImageSize = 15 * 1024 * 1024;
@@ -173,9 +202,12 @@ export class UploadController {
       throw new BadRequestException('Ukuran file hasil akhir maksimal 100MB.');
     }
 
-    const folderPath = `commissions/${commissionId}/final`;
-    const url = await this.uploadService.uploadFile(file, folderPath);
+    const result = await this.uploadService.handleCommissionFinalUpload(commissionId, file);
 
-    return { url };
+    await this.commissionsRepository.updateProgress(commissionId, {
+      final_file_url: result.url,
+    });
+
+    return result;
   }
 }

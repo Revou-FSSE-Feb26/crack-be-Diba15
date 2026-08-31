@@ -58,9 +58,10 @@ describe('CommissionsController', () => {
   });
 
   describe('findAll', () => {
-    it('should call commissionsService.findAllByUser', async () => {
-      const result = await controller.findAll('u-005', 'client');
-      expect(service.findAllByUser).toHaveBeenCalledWith('u-005', 'client');
+    it('should call commissionsService.findAllByUser with requester and role filter', async () => {
+      const requester = { sub: 'u-005', email: 'budi@example.com', role: 'client' as const };
+      const result = await controller.findAll(requester, 'client');
+      expect(service.findAllByUser).toHaveBeenCalledWith('u-005', 'client', 'client');
       expect(result).toEqual([mockCommissionResponse]);
     });
   });

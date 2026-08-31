@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { CommissionsRepositoryInterface } from '../common/interfaces/commissions.repository.interface';
 import type { CommissionStatus, PaymentMethod } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -51,7 +52,7 @@ const commissionWithRelationsSelect = {
 };
 
 @Injectable()
-export class CommissionsRepository {
+export class CommissionsRepository implements CommissionsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async createCommission(
@@ -67,17 +68,7 @@ export class CommissionsRepository {
     const { artistsId, commissionTitle, description, price, paymentMethod } = data;
 
     return this.prisma.$transaction(async (tx) => {
-      // 1. Potong saldo client
-      await tx.user.update({
-        where: { id: clientId },
-        data: {
-          balance: {
-            decrement: price,
-          },
-        },
-      });
-
-      // 2. Buat komisi
+      // 1. Buat komisi dengan status pending & unpaid (saldo dipotong saat client bayar setelah diterima artist)
       const commission = await tx.commission.create({
         data: {
           clientId,
@@ -86,12 +77,12 @@ export class CommissionsRepository {
           description: description || null,
           price,
           status: 'pending',
-          paymentStatus: 'paid',
+          paymentStatus: 'unpaid',
           paymentMethod: paymentMethod || 'wallet',
         },
       });
 
-      // 3. Inisialisasi progress komisi
+      // 2. Inisialisasi progress komisi
       await tx.commissionProgress.create({
         data: {
           commissionId: commission.id,
@@ -124,6 +115,23 @@ export class CommissionsRepository {
     });
   }
 
+  async findAllCommissions(role?: 'client' | 'artist') {
+    const where: any = {};
+    if (role === 'artist') {
+      where.artistsId = { not: undefined };
+    } else if (role === 'client') {
+      where.clientId = { not: undefined };
+    }
+
+    return this.prisma.commission.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      ...commissionWithRelationsSelect,
+    });
+  }
+
   async findCommissionById(id: string) {
     return this.prisma.commission.findUnique({
       where: { id },
@@ -139,21 +147,33 @@ export class CommissionsRepository {
       if (!commission) return null;
 
       if (status === 'cancelled' || status === ('rejected' as any)) {
-        // Refund saldo ke client jika ditolak
-        await tx.user.update({
-          where: { id: commission.clientId },
-          data: {
-            balance: {
-              increment: commission.price,
+        if (commission.paymentStatus === 'paid') {
+          await tx.user.update({
+            where: { id: commission.clientId },
+            data: {
+              balance: {
+                increment: commission.price,
+              },
             },
-          },
-        });
+          });
+
+          await tx.walletTransaction.create({
+            data: {
+              userId: commission.clientId,
+              type: 'refund',
+              amount: commission.price,
+              title: `Pengembalian Dana Penolakan Komisi "${commission.commissionTitle}"`,
+              commissionId: commission.id,
+              status: 'success',
+            },
+          });
+        }
 
         return tx.commission.update({
           where: { id },
           data: {
             status: 'cancelled',
-            paymentStatus: 'refunded',
+            paymentStatus: commission.paymentStatus === 'paid' ? 'refunded' : 'unpaid',
           },
           ...commissionWithRelationsSelect,
         });
@@ -162,7 +182,61 @@ export class CommissionsRepository {
       return tx.commission.update({
         where: { id },
         data: {
+          status: 'accepted',
+        },
+        ...commissionWithRelationsSelect,
+      });
+    });
+  }
+
+  async payCommission(id: string, paymentMethod: PaymentMethod = 'wallet', cardLastFour?: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const commission = await tx.commission.findUnique({
+        where: { id },
+      });
+      if (!commission) return null;
+
+      const client = await tx.user.findUnique({
+        where: { id: commission.clientId },
+      });
+
+      if (paymentMethod === 'wallet' && (!client || client.balance < commission.price)) {
+        throw new Error('Saldo E-Wallet Anda tidak mencukupi untuk melakukan pembayaran komisi.');
+      }
+
+      if (paymentMethod === 'wallet' && client) {
+        await tx.user.update({
+          where: { id: commission.clientId },
+          data: {
+            balance: {
+              decrement: commission.price,
+            },
+          },
+        });
+      }
+
+      await tx.walletTransaction.create({
+        data: {
+          userId: commission.clientId,
+          type: 'payment',
+          amount: commission.price,
+          title: `Pembayaran Komisi "${commission.commissionTitle}" (Escrow)`,
+          commissionId: commission.id,
+          status: 'success',
+          metadata: {
+            payment_method: paymentMethod,
+            card_last_four: cardLastFour || null,
+          },
+        },
+      });
+
+      return tx.commission.update({
+        where: { id },
+        data: {
           status: 'in_progress',
+          paymentStatus: 'paid',
+          paymentMethod,
+          cardLastFour: cardLastFour || null,
         },
         ...commissionWithRelationsSelect,
       });
@@ -171,19 +245,26 @@ export class CommissionsRepository {
 
   async updateProgress(
     commissionId: string,
-    data: { sketchUrl?: string; finalArtworkUrl?: string },
+    data: {
+      sketch_url?: string;
+      final_artwork_url?: string;
+      final_file_url?: string;
+    },
   ) {
     return this.prisma.$transaction(async (tx) => {
       await tx.commissionProgress.upsert({
         where: { commissionId },
         update: {
-          sketchUrl: data.sketchUrl !== undefined ? data.sketchUrl : undefined,
-          finalArtworkUrl: data.finalArtworkUrl !== undefined ? data.finalArtworkUrl : undefined,
+          sketchUrl: data.sketch_url !== undefined ? data.sketch_url : undefined,
+          finalArtworkUrl:
+            data.final_artwork_url !== undefined ? data.final_artwork_url : undefined,
+          finalFileUrl: data.final_file_url !== undefined ? data.final_file_url : undefined,
         },
         create: {
           commissionId,
-          sketchUrl: data.sketchUrl || null,
-          finalArtworkUrl: data.finalArtworkUrl || null,
+          sketchUrl: data.sketch_url || null,
+          finalArtworkUrl: data.final_artwork_url || null,
+          finalFileUrl: data.final_file_url || null,
         },
       });
 
@@ -207,29 +288,79 @@ export class CommissionsRepository {
           data: { sketchApproved: true },
         });
       } else if (step === 'final') {
-        // Approve final -> pelepasan dana dari escrow ke wallet artis
+        // Approve preview final oleh Client -> menandai finalArtworkApproved: true
         await tx.commissionProgress.update({
           where: { commissionId },
           data: { finalArtworkApproved: true },
         });
+      }
 
-        await tx.user.update({
-          where: { id: commission.artistsId },
-          data: {
-            balance: {
-              increment: commission.price,
-            },
-          },
-        });
+      return tx.commission.findUnique({
+        where: { id: commissionId },
+        ...commissionWithRelationsSelect,
+      });
+    });
+  }
 
-        await tx.commission.update({
+  async completeCommission(commissionId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const commission = await tx.commission.findUnique({
+        where: { id: commissionId },
+      });
+      if (!commission) return null;
+
+      if (commission.status === 'completed') {
+        return tx.commission.findUnique({
           where: { id: commissionId },
-          data: {
-            status: 'completed',
-            paymentStatus: 'released',
-          },
+          ...commissionWithRelationsSelect,
         });
       }
+
+      // Hitung potongan platform fee 5% dan dana bersih yang diterima artis (95%)
+      const platformFee = Math.round(commission.price * 0.05);
+      const artistPayout = commission.price - platformFee;
+
+      // Transfer saldo bersih dari Escrow ke wallet artis
+      await tx.user.update({
+        where: { id: commission.artistsId },
+        data: {
+          balance: {
+            increment: artistPayout,
+          },
+        },
+      });
+
+      // Catat mutasi pencairan dana ke artis
+      await tx.walletTransaction.create({
+        data: {
+          userId: commission.artistsId,
+          type: 'release',
+          amount: artistPayout,
+          title: `Pencairan Dana Komisi "${commission.commissionTitle}"`,
+          commissionId: commission.id,
+          status: 'success',
+        },
+      });
+
+      // Catat mutasi fee platform 5%
+      await tx.walletTransaction.create({
+        data: {
+          userId: commission.artistsId,
+          type: 'platform_fee',
+          amount: platformFee,
+          title: `Biaya Layanan Platform 5% ("${commission.commissionTitle}")`,
+          commissionId: commission.id,
+          status: 'success',
+        },
+      });
+
+      await tx.commission.update({
+        where: { id: commissionId },
+        data: {
+          status: 'completed',
+          paymentStatus: 'released',
+        },
+      });
 
       return tx.commission.findUnique({
         where: { id: commissionId },
@@ -269,24 +400,56 @@ export class CommissionsRepository {
       });
       if (!commission) return null;
 
-      // Refund dana ke client
-      await tx.user.update({
-        where: { id: commission.clientId },
-        data: {
-          balance: {
-            increment: commission.price,
+      if (commission.paymentStatus === 'paid') {
+        // Refund dana ke client
+        await tx.user.update({
+          where: { id: commission.clientId },
+          data: {
+            balance: {
+              increment: commission.price,
+            },
           },
-        },
-      });
+        });
+
+        await tx.walletTransaction.create({
+          data: {
+            userId: commission.clientId,
+            type: 'refund',
+            amount: commission.price,
+            title: `Pengembalian Dana Pembatalan Komisi "${commission.commissionTitle}"`,
+            commissionId: commission.id,
+            status: 'success',
+          },
+        });
+      }
 
       return tx.commission.update({
         where: { id: commissionId },
         data: {
           status: 'cancelled',
-          paymentStatus: 'refunded',
+          paymentStatus: commission.paymentStatus === 'paid' ? 'refunded' : 'unpaid',
         },
         ...commissionWithRelationsSelect,
       });
+    });
+  }
+
+  async findArtistWithProfile(id: string) {
+    return this.prisma.user.findFirst({
+      where: { id, role: 'artist' },
+      include: { profile: true },
+    });
+  }
+
+  async findClientUser(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
+  async findCommissionProgress(commissionId: string) {
+    return this.prisma.commissionProgress.findUnique({
+      where: { commissionId },
     });
   }
 }

@@ -27,6 +27,17 @@ describe('UsersController', () => {
         message: 'Top-up saldo berhasil.',
         user: { ...mockUserResponse, balance: 2500000 },
       }),
+      withdraw: jest.fn().mockResolvedValue({
+        message: 'Permintaan penarikan dana sebesar Rp 250.000 berhasil diproses.',
+        payout: {
+          amount: 250000,
+          bankName: 'BCA',
+          accountNumber: '1234567890',
+          accountName: 'Ari Ramadan',
+          processedAt: new Date().toISOString(),
+        },
+        user: { ...mockUserResponse, id: 'u-001', role: 'artist', balance: 750000 },
+      }),
       remove: jest.fn().mockResolvedValue({ message: 'User berhasil dihapus.' }),
     };
 
@@ -57,6 +68,21 @@ describe('UsersController', () => {
       expect(service.topUp).toHaveBeenCalledWith('u-005', dto);
       expect(result.message).toBe('Top-up saldo berhasil.');
       expect(result.user.balance).toBe(2500000);
+    });
+  });
+
+  describe('withdraw', () => {
+    it('should call usersService.withdraw with current artist user id and dto', async () => {
+      const dto = {
+        amount: 250000,
+        bankName: 'BCA',
+        accountNumber: '1234567890',
+        accountName: 'Ari Ramadan',
+      };
+      const result = await controller.withdraw('u-001', dto);
+      expect(service.withdraw).toHaveBeenCalledWith('u-001', dto);
+      expect(result.payout.amount).toBe(250000);
+      expect(result.user.balance).toBe(750000);
     });
   });
 

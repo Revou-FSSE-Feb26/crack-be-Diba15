@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import type { FavoriteRepositoryInterface } from '../common/interfaces/favorite.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class FavoriteRepository {
+export class FavoriteRepository implements FavoriteRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async findFavorite(userId: string, artworkId: string) {

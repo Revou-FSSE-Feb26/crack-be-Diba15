@@ -79,6 +79,27 @@ enum DisputeStatus {
   rejected
 }
 
+enum AppealStatus {
+  pending
+  approved
+  rejected
+}
+
+enum TransactionType {
+  topup
+  withdraw
+  payment
+  release
+  refund
+  platform_fee
+}
+
+enum TransactionStatus {
+  pending
+  success
+  failed
+}
+
 // =============================================================================
 // USER & PROFILE
 // =============================================================================
@@ -105,9 +126,12 @@ model User {
   reportsCurating     Report[]          @relation("ReportCurator")
   artworksReviewed    Artwork[]         @relation("ArtworkReviewer")
   favorites           Favorite[]
-  following           Follow[]          @relation("Follower")
-  followers           Follow[]          @relation("FollowedArtist")
+  following           Follow[]             @relation("Follower")
+  followers           Follow[]             @relation("FollowedArtist")
   passwordResetTokens PasswordResetToken[]
+  walletTransactions  WalletTransaction[]
+  appealsSubmitted    Appeal[]             @relation("ArtistAppeals")
+  appealsResolved     Appeal[]             @relation("AdminResolvedAppeals")
 
   @@map("users")
 }
@@ -216,9 +240,10 @@ model Commission {
   // Relations
   artist    User                 @relation("ArtistCommissions", fields: [artistsId], references: [id])
   client    User                 @relation("ClientCommissions", fields: [clientId], references: [id])
-  progress  CommissionProgress?
-  revisions Revision[]
-  dispute   DisputeLog?
+  progress     CommissionProgress?
+  revisions    Revision[]
+  dispute      DisputeLog?
+  transactions WalletTransaction[]
 
   @@map("commissions")
 }
@@ -230,6 +255,7 @@ model CommissionProgress {
   sketchApproved       Boolean  @default(false) @map("sketch_approved")
   finalArtworkUrl      String?  @map("final_artwork_url")
   finalArtworkApproved Boolean  @default(false) @map("final_artwork_approved")
+  finalFileUrl         String?  @map("final_file_url")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
   commission Commission @relation(fields: [commissionId], references: [id], onDelete: Cascade)
@@ -330,4 +356,45 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
+}
+
+// =============================================================================
+// WALLET TRANSACTION / LEDGER
+// =============================================================================
+
+model WalletTransaction {
+  id           String            @id @default(uuid())
+  userId       String            @map("user_id")
+  type         TransactionType
+  amount       Float
+  title        String
+  status       TransactionStatus @default(success)
+  commissionId String?           @map("commission_id")
+  metadata     Json?             @map("metadata")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commission Commission? @relation(fields: [commissionId], references: [id])
+
+  @@map("wallet_transactions")
+}
+
+// =============================================================================
+// APPEAL (BANDING AKUN ARTIST)
+// =============================================================================
+
+model Appeal {
+  id              String       @id @default(uuid())
+  artistId        String       @map("artist_id")
+  reason          String
+  status          AppealStatus @default(pending)
+  resolvedById    String?      @map("resolved_by_id")
+  resolutionNotes String?      @map("resolution_notes")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  artist     User  @relation("ArtistAppeals", fields: [artistId], references: [id], onDelete: Cascade)
+  resolvedBy User? @relation("AdminResolvedAppeals", fields: [resolvedById], references: [id])
+
+  @@map("appeals")
 }

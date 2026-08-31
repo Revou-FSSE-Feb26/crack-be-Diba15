@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import type { UsersRepositoryInterface } from '../common/interfaces/users.repository.interface';
 import type { Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class UsersRepository {
+export class UsersRepository implements UsersRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string) {
@@ -98,20 +99,66 @@ export class UsersRepository {
   }
 
   async topUp(id: string, amount: number) {
-    return this.prisma.user.update({
-      where: { id },
-      data: {
-        balance: {
-          increment: amount,
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          balance: {
+            increment: amount,
+          },
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        balance: true,
-      },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          balance: true,
+        },
+      });
+
+      await tx.walletTransaction.create({
+        data: {
+          userId: id,
+          type: 'topup',
+          amount,
+          title: 'Top Up Saldo E-Wallet',
+          status: 'success',
+        },
+      });
+
+      return user;
+    });
+  }
+
+  async withdraw(id: string, amount: number) {
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: {
+          balance: {
+            decrement: amount,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          balance: true,
+        },
+      });
+
+      await tx.walletTransaction.create({
+        data: {
+          userId: id,
+          type: 'withdraw',
+          amount,
+          title: 'Penarikan Dana Artis (Withdraw)',
+          status: 'success',
+        },
+      });
+
+      return user;
     });
   }
 

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { ReportsRepositoryInterface } from '../common/interfaces/reports.repository.interface';
 import type { ReportStatus, ReportTargetType } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -46,7 +47,7 @@ const reportWithRelationsSelect = {
 };
 
 @Injectable()
-export class ReportsRepository {
+export class ReportsRepository implements ReportsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async createReport(
@@ -114,19 +115,38 @@ export class ReportsRepository {
         ...reportWithRelationsSelect,
       });
 
-      if (status === 'resolved' && report.artwork?.artistsId) {
-        const artistId = report.artwork.artistsId;
-        await tx.profile.update({
-          where: { userId: artistId },
-          data: {
-            strikeCount: {
-              increment: 1,
+      if (status === 'resolved') {
+        const targetArtworkId = report.artworkId || report.targetId;
+        if (targetArtworkId) {
+          await tx.artwork.update({
+            where: { id: targetArtworkId },
+            data: {
+              isVisibleOnFeed: false,
+              curationStatus: 'flagged',
             },
-          },
-        });
+          });
+        }
+
+        if (report.artwork?.artistsId) {
+          const artistId = report.artwork.artistsId;
+          await tx.profile.update({
+            where: { userId: artistId },
+            data: {
+              strikeCount: {
+                increment: 1,
+              },
+            },
+          });
+        }
       }
 
       return updatedReport;
+    });
+  }
+
+  async findArtworkById(id: string) {
+    return this.prisma.artwork.findUnique({
+      where: { id },
     });
   }
 }

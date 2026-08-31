@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
@@ -9,6 +10,8 @@ import { DisputesService } from './disputes.service';
 import { CreateDisputeDto } from './dto/create-dispute.dto';
 import { ResolveDisputeDto } from './dto/resolve-dispute.dto';
 
+@ApiTags('Disputes')
+@ApiBearerAuth('JWT-auth')
 @Controller('disputes')
 @UseGuards(JwtAccessGuard)
 export class DisputesController {
@@ -19,6 +22,8 @@ export class DisputesController {
    * Client atau Artis mengajukan sengketa komisi.
    */
   @Post()
+  @ApiOperation({ summary: 'Mengajukan sengketa komisi (Client / Artist)' })
+  @ApiResponse({ status: 201, description: 'Sengketa berhasil diajukan' })
   create(@GetCurrentUser('sub') reporterId: string, @Body() dto: CreateDisputeDto) {
     return this.disputesService.create(reporterId, dto);
   }
@@ -30,6 +35,9 @@ export class DisputesController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles('curator', 'admin')
+  @ApiOperation({ summary: 'Melihat daftar seluruh sengketa (Kurator / Admin)' })
+  @ApiResponse({ status: 200, description: 'Daftar sengketa' })
+  @ApiResponse({ status: 403, description: 'Forbidden: Kurator / Admin only' })
   findAll(@Query('status') status?: DisputeStatus) {
     return this.disputesService.findAll(status);
   }
@@ -39,6 +47,9 @@ export class DisputesController {
    * Detail sengketa komisi.
    */
   @Get(':id')
+  @ApiOperation({ summary: 'Melihat detail sengketa komisi' })
+  @ApiResponse({ status: 200, description: 'Detail sengketa' })
+  @ApiResponse({ status: 404, description: 'Sengketa tidak ditemukan' })
   findOne(@Param('id') id: string, @GetCurrentUser() requester: JwtPayload) {
     return this.disputesService.findOne(id, requester.sub, requester.role);
   }
@@ -50,6 +61,9 @@ export class DisputesController {
   @Patch(':id/resolve')
   @UseGuards(RolesGuard)
   @Roles('curator', 'admin')
+  @ApiOperation({ summary: 'Menyelesaikan sengketa komisi (Kurator / Admin)' })
+  @ApiResponse({ status: 200, description: 'Sengketa diselesaikan' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   resolve(
     @Param('id') id: string,
     @GetCurrentUser('sub') mediatorId: string,

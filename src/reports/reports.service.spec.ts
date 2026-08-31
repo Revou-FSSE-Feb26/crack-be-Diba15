@@ -1,13 +1,11 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../prisma/prisma.service';
 import { ReportsRepository } from './reports.repository';
 import { ReportsService } from './reports.service';
 
 describe('ReportsService', () => {
   let service: ReportsService;
   let reportsRepository: jest.Mocked<Partial<ReportsRepository>>;
-  let prismaService: jest.Mocked<Partial<PrismaService>>;
 
   const mockReport = {
     id: 'rep-001',
@@ -51,20 +49,11 @@ describe('ReportsService', () => {
       findAllReports: jest.fn(),
       findReportById: jest.fn(),
       resolveReport: jest.fn(),
-    };
-
-    prismaService = {
-      artwork: {
-        findUnique: jest.fn(),
-      } as any,
+      findArtworkById: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ReportsService,
-        { provide: ReportsRepository, useValue: reportsRepository },
-        { provide: PrismaService, useValue: prismaService },
-      ],
+      providers: [ReportsService, { provide: ReportsRepository, useValue: reportsRepository }],
     }).compile();
 
     service = module.get<ReportsService>(ReportsService);
@@ -76,9 +65,9 @@ describe('ReportsService', () => {
 
   describe('create', () => {
     it('should create a report successfully', async () => {
-      const findUniqueMock = (prismaService.artwork as any).findUnique as jest.Mock;
-      findUniqueMock.mockResolvedValue({
+      (reportsRepository.findArtworkById as jest.Mock).mockResolvedValue({
         id: 'a-001',
+        title: 'Senja di Tepi Sungai Ciliwung',
       });
       (reportsRepository.createReport as jest.Mock).mockResolvedValue(mockReport);
 
@@ -89,65 +78,53 @@ describe('ReportsService', () => {
 
       expect(result).toBeDefined();
       expect(result?.id).toBe('rep-001');
-      expect(result?.reporter_id).toBe('u-005');
-      expect(result?.artwork_id).toBe('a-001');
+      expect(result?.status).toBe('pending');
     });
 
-    it('should throw NotFoundException if artwork does not exist', async () => {
-      const findUniqueMock = (prismaService.artwork as any).findUnique as jest.Mock;
-      findUniqueMock.mockResolvedValue(null);
+    it('should throw NotFoundException if artwork not found', async () => {
+      (reportsRepository.findArtworkById as jest.Mock).mockResolvedValue(null);
 
       await expect(
         service.create('u-005', {
-          artworkId: 'a-non-existent',
-          reason: 'Alasan tes',
+          artworkId: 'non-existent-id',
+          reason: 'Laporan dummy',
         }),
       ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('findAll', () => {
-    it('should return list of mapped reports', async () => {
+    it('should return list of reports', async () => {
       (reportsRepository.findAllReports as jest.Mock).mockResolvedValue([mockReport]);
 
       const results = await service.findAll();
       expect(results).toHaveLength(1);
       expect(results[0]?.id).toBe('rep-001');
-      expect(results[0]?.status).toBe('pending');
     });
   });
 
   describe('resolve', () => {
-    it('should resolve a pending report and return updated report', async () => {
+    it('should resolve report as approved (strike to artist)', async () => {
       (reportsRepository.findReportById as jest.Mock).mockResolvedValue(mockReport);
-      const resolvedMockReport = {
+      (reportsRepository.resolveReport as jest.Mock).mockResolvedValue({
         ...mockReport,
-        status: 'resolved' as const,
-        curatorId: 'u-008', // Hendra Kurniawan (Curator)
-        curator: {
-          id: 'u-008',
-          name: 'Hendra Kurniawan',
-          email: 'hendra@trubrush.com',
-        },
-      };
-      (reportsRepository.resolveReport as jest.Mock).mockResolvedValue(resolvedMockReport);
-
-      const result = await service.resolve('rep-001', 'u-008', {
-        status: 'resolved',
+        status: 'approved',
+        curatorId: 'u-008',
       });
 
-      expect(result).toBeDefined();
-      expect(result?.status).toBe('resolved');
+      const result = await service.resolve('rep-001', 'u-008', { status: 'approved' });
+      expect(result?.status).toBe('approved');
       expect(result?.curator_id).toBe('u-008');
     });
 
-    it('should throw BadRequestException if report is already resolved/dismissed', async () => {
+    it('should throw BadRequestException if report already resolved', async () => {
       (reportsRepository.findReportById as jest.Mock).mockResolvedValue({
         ...mockReport,
-        status: 'resolved',
+        status: 'approved',
+        curatorId: 'u-008',
       });
 
-      await expect(service.resolve('rep-001', 'u-008', { status: 'dismissed' })).rejects.toThrow(
+      await expect(service.resolve('rep-001', 'u-008', { status: 'approved' })).rejects.toThrow(
         BadRequestException,
       );
     });

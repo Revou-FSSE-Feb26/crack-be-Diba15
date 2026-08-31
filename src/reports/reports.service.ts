@@ -1,16 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { ReportStatus } from '../generated/prisma/enums';
-import { PrismaService } from '../prisma/prisma.service';
 import type { CreateReportDto } from './dto/create-report.dto';
 import type { ResolveReportDto } from './dto/resolve-report.dto';
 import { ReportsRepository } from './reports.repository';
 
 @Injectable()
 export class ReportsService {
-  constructor(
-    private readonly reportsRepository: ReportsRepository,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly reportsRepository: ReportsRepository) {}
 
   private mapReportResponse(report: any) {
     if (!report) return null;
@@ -63,9 +59,7 @@ export class ReportsService {
   async create(reporterId: string, dto: CreateReportDto) {
     const { artworkId, reason, targetType } = dto;
 
-    const artwork = await this.prisma.artwork.findUnique({
-      where: { id: artworkId },
-    });
+    const artwork = await this.reportsRepository.findArtworkById(artworkId);
 
     if (!artwork) {
       throw new NotFoundException('Artwork yang dilaporkan tidak ditemukan.');

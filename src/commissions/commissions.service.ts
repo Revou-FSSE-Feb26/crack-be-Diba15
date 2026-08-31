@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CommissionsRepository } from './commissions.repository';
 import type { CreateCommissionDto } from './dto/create-commission.dto';
 import type { CreateRevisionDto } from './dto/create-revision.dto';
@@ -13,13 +12,24 @@ import type { UpdateProgressDto } from './dto/update-progress.dto';
 
 @Injectable()
 export class CommissionsService {
-  constructor(
-    private readonly commissionsRepository: CommissionsRepository,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly commissionsRepository: CommissionsRepository) {}
+
+  private mapDispute(dispute: any) {
+    if (!dispute) return null;
+    return {
+      id: dispute.id,
+      commission_id: dispute.commissionId,
+      reason: dispute.reason,
+      status: dispute.status,
+      mediator_id: dispute.mediatorId || null,
+      created_at: dispute.createdAt.toISOString(),
+    };
+  }
 
   private mapCommissionResponse(commission: any) {
     if (!commission) return null;
+    const mappedDispute = this.mapDispute(commission.dispute);
+
     return {
       id: commission.id,
       artists_id: commission.artistsId,
@@ -27,6 +37,8 @@ export class CommissionsService {
       commission_title: commission.commissionTitle,
       description: commission.description,
       price: commission.price,
+      platform_fee: Math.round(commission.price * 0.05),
+      net_artist_amount: commission.price - Math.round(commission.price * 0.05),
       status: commission.status,
       payment_status: commission.paymentStatus,
       payment_method: commission.paymentMethod,
@@ -58,6 +70,7 @@ export class CommissionsService {
             sketch_approved: commission.progress.sketchApproved,
             final_artwork_url: commission.progress.finalArtworkUrl || null,
             final_artwork_approved: commission.progress.finalArtworkApproved,
+            final_file_url: (commission.progress as any).finalFileUrl || null,
             updated_at: commission.progress.updatedAt.toISOString(),
           }
         : undefined,
@@ -76,48 +89,50 @@ export class CommissionsService {
               : undefined,
           }))
         : [],
+      dispute: mappedDispute,
+      disputes: mappedDispute ? [mappedDispute] : [],
     };
   }
 
   async create(clientId: string, dto: CreateCommissionDto) {
-    const { artistsId, price } = dto;
+    const { artistsId } = dto;
 
     if (clientId === artistsId) {
       throw new BadRequestException('Anda tidak dapat memesan komisi ke diri sendiri.');
     }
 
-    const artist = await this.prisma.user.findFirst({
-      where: { id: artistsId, role: 'artist' },
-      include: { profile: true },
-    });
+    const artist = await this.commissionsRepository.findArtistWithProfile(artistsId);
 
     if (!artist?.profile) {
       throw new NotFoundException('Artis penerima komisi tidak ditemukan.');
+    }
+
+    if (!artist.profile.isVerified) {
+      throw new BadRequestException(
+        'Artis ini belum terverifikasi oleh kurator dan belum dapat menerima pesanan komisi.',
+      );
     }
 
     if (!artist.profile.isOpenForCommission) {
       throw new BadRequestException('Artis ini sedang tidak menerima komisi.');
     }
 
-    const client = await this.prisma.user.findUnique({
-      where: { id: clientId },
-    });
+    const client = await this.commissionsRepository.findClientUser(clientId);
 
     if (!client) {
       throw new NotFoundException('Client tidak ditemukan.');
-    }
-
-    if (client.balance < price) {
-      throw new BadRequestException(
-        `Saldo Anda tidak mencukupi untuk memesan komisi ini. Saldo saat ini: Rp${client.balance.toLocaleString()}, harga komisi: Rp${price.toLocaleString()}.`,
-      );
     }
 
     const commission = await this.commissionsRepository.createCommission(clientId, dto);
     return this.mapCommissionResponse(commission);
   }
 
-  async findAllByUser(userId: string, role?: 'client' | 'artist') {
+  async findAllByUser(userId: string, requesterRole?: string, role?: 'client' | 'artist') {
+    if (requesterRole === 'admin') {
+      const commissions = await this.commissionsRepository.findAllCommissions(role);
+      return commissions.map((c) => this.mapCommissionResponse(c));
+    }
+
     const commissions = await this.commissionsRepository.findCommissionsByUser(userId, role);
     return commissions.map((c) => this.mapCommissionResponse(c));
   }
@@ -157,6 +172,33 @@ export class CommissionsService {
 
     const updated = await this.commissionsRepository.respondCommission(id, dto.status);
     return this.mapCommissionResponse(updated);
+  }
+
+  async pay(id: string, clientId: string, paymentMethod?: any, cardLastFour?: string) {
+    const commission = await this.commissionsRepository.findCommissionById(id);
+
+    if (!commission) {
+      throw new NotFoundException('Komisi tidak ditemukan.');
+    }
+
+    if (commission.clientId !== clientId) {
+      throw new ForbiddenException('Hanya client pemesan yang dapat melakukan pembayaran.');
+    }
+
+    if (commission.paymentStatus === 'paid') {
+      throw new BadRequestException('Komisi ini sudah dibayar sebelumnya.');
+    }
+
+    try {
+      const updated = await this.commissionsRepository.payCommission(
+        id,
+        paymentMethod,
+        cardLastFour,
+      );
+      return this.mapCommissionResponse(updated);
+    } catch (error: any) {
+      throw new BadRequestException(error.message || 'Gagal melakukan pembayaran komisi.');
+    }
   }
 
   async updateProgress(id: string, artistId: string, dto: UpdateProgressDto) {
@@ -204,6 +246,27 @@ export class CommissionsService {
     }
 
     const updated = await this.commissionsRepository.approveStep(id, step);
+    return this.mapCommissionResponse(updated);
+  }
+
+  async completeCommission(id: string, artistId: string) {
+    const commission = await this.commissionsRepository.findCommissionById(id);
+
+    if (!commission) {
+      throw new NotFoundException('Komisi tidak ditemukan.');
+    }
+
+    if (commission.artistsId !== artistId) {
+      throw new ForbiddenException(
+        'Hanya artis penerima komisi yang dapat mengunggah berkas akhir.',
+      );
+    }
+
+    if (!commission.progress?.finalArtworkApproved) {
+      throw new BadRequestException('Client belum menyetujui pratinjau hasil karya akhir.');
+    }
+
+    const updated = await this.commissionsRepository.completeCommission(id);
     return this.mapCommissionResponse(updated);
   }
 

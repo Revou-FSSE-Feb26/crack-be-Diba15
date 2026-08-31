@@ -1,13 +1,11 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../prisma/prisma.service';
 import { CommissionsRepository } from './commissions.repository';
 import { CommissionsService } from './commissions.service';
 
 describe('CommissionsService', () => {
   let service: CommissionsService;
   let commissionsRepository: jest.Mocked<Partial<CommissionsRepository>>;
-  let prismaService: jest.Mocked<Partial<PrismaService>>;
 
   const mockCommission = {
     id: 'c-001',
@@ -57,26 +55,23 @@ describe('CommissionsService', () => {
     commissionsRepository = {
       createCommission: jest.fn(),
       findCommissionsByUser: jest.fn(),
+      findAllCommissions: jest.fn(),
       findCommissionById: jest.fn(),
       respondCommission: jest.fn(),
       updateProgress: jest.fn(),
       approveStep: jest.fn(),
       addRevision: jest.fn(),
       cancelCommission: jest.fn(),
-    };
-
-    prismaService = {
-      user: {
-        findFirst: jest.fn(),
-        findUnique: jest.fn(),
-      } as any,
+      completeCommission: jest.fn(),
+      findArtistWithProfile: jest.fn(),
+      findClientUser: jest.fn(),
+      findCommissionProgress: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CommissionsService,
         { provide: CommissionsRepository, useValue: commissionsRepository },
-        { provide: PrismaService, useValue: prismaService },
       ],
     }).compile();
 
@@ -89,15 +84,12 @@ describe('CommissionsService', () => {
 
   describe('create', () => {
     it('should create commission and deduct client balance if client has enough funds', async () => {
-      const findFirstMock = (prismaService.user as any).findFirst as jest.Mock;
-      const findUniqueMock = (prismaService.user as any).findUnique as jest.Mock;
-
-      findFirstMock.mockResolvedValue({
+      (commissionsRepository.findArtistWithProfile as jest.Mock).mockResolvedValue({
         id: 'u-001',
         role: 'artist',
-        profile: { isOpenForCommission: true },
+        profile: { isVerified: true, isOpenForCommission: true },
       });
-      findUniqueMock.mockResolvedValue({
+      (commissionsRepository.findClientUser as jest.Mock).mockResolvedValue({
         id: 'u-005',
         balance: 2000000,
       });
@@ -115,18 +107,27 @@ describe('CommissionsService', () => {
       expect(result?.status).toBe('pending');
     });
 
-    it('should throw BadRequestException if client has insufficient balance', async () => {
-      const findFirstMock = (prismaService.user as any).findFirst as jest.Mock;
-      const findUniqueMock = (prismaService.user as any).findUnique as jest.Mock;
-
-      findFirstMock.mockResolvedValue({
+    it('should throw BadRequestException if artist is not verified', async () => {
+      (commissionsRepository.findArtistWithProfile as jest.Mock).mockResolvedValue({
         id: 'u-001',
         role: 'artist',
-        profile: { isOpenForCommission: true },
+        profile: { isVerified: false, isOpenForCommission: true },
       });
-      findUniqueMock.mockResolvedValue({
-        id: 'u-005',
-        balance: 100000, // Insufficient for 450000
+
+      await expect(
+        service.create('u-005', {
+          artistsId: 'u-001',
+          commissionTitle: 'Tes Komisi',
+          price: 450000,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if artist is not open for commission', async () => {
+      (commissionsRepository.findArtistWithProfile as jest.Mock).mockResolvedValue({
+        id: 'u-001',
+        role: 'artist',
+        profile: { isVerified: true, isOpenForCommission: false },
       });
 
       await expect(
@@ -140,14 +141,24 @@ describe('CommissionsService', () => {
   });
 
   describe('findAllByUser', () => {
-    it('should return list of user commissions', async () => {
+    it('should return list of user commissions for client/artist', async () => {
       (commissionsRepository.findCommissionsByUser as jest.Mock).mockResolvedValue([
         mockCommission,
       ]);
 
-      const results = await service.findAllByUser('u-005', 'client');
+      const results = await service.findAllByUser('u-005', 'client', 'client');
       expect(results).toHaveLength(1);
       expect(results[0]?.id).toBe('c-001');
+      expect(commissionsRepository.findCommissionsByUser).toHaveBeenCalledWith('u-005', 'client');
+    });
+
+    it('should return all platform commissions if requester is admin', async () => {
+      (commissionsRepository.findAllCommissions as jest.Mock).mockResolvedValue([mockCommission]);
+
+      const results = await service.findAllByUser('u-004', 'admin');
+      expect(results).toHaveLength(1);
+      expect(results[0]?.id).toBe('c-001');
+      expect(commissionsRepository.findAllCommissions).toHaveBeenCalled();
     });
   });
 
@@ -159,11 +170,19 @@ describe('CommissionsService', () => {
         status: 'in_progress',
       });
 
-      const result = await service.respond('c-001', 'u-001', {
-        status: 'accepted' as any,
+      const result = await service.respond('c-001', 'u-001', { status: 'in_progress' });
+      expect(result?.status).toBe('in_progress');
+    });
+
+    it('should reject commission if artist rejects', async () => {
+      (commissionsRepository.findCommissionById as jest.Mock).mockResolvedValue(mockCommission);
+      (commissionsRepository.respondCommission as jest.Mock).mockResolvedValue({
+        ...mockCommission,
+        status: 'rejected',
       });
 
-      expect(result?.status).toBe('in_progress');
+      const result = await service.respond('c-001', 'u-001', { status: 'rejected' });
+      expect(result?.status).toBe('rejected');
     });
   });
 });

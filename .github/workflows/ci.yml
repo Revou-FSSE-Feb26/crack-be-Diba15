@@ -1,0 +1,53 @@
+name: Backend CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test-and-build:
+    name: Lint, Test & Build (NestJS)
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/trubrush_test"
+      DIRECT_URL: "postgresql://postgres:postgres@localhost:5432/trubrush_test"
+      JWT_ACCESS_SECRET: "ci_jwt_access_secret_key_12345"
+      JWT_REFRESH_SECRET: "ci_jwt_refresh_secret_key_12345"
+      RESEND_API_KEY: "re_mock_ci_api_key_123"
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: 📥 Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🗄️ Generate Prisma Client
+        run: pnpm prisma generate
+
+      - name: 🔍 Biome Lint & Format Check
+        run: pnpm biome check .
+
+      - name: 🧪 Run Jest Unit Tests
+        run: pnpm test
+
+      - name: 🏗️ Build Production Bundle
+        run: pnpm run build
