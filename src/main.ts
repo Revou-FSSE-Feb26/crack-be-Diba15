@@ -4,11 +4,23 @@ import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { PrismaClientExceptionFilter } from './prisma/prisma-client-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Helmet — untuk security headers
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+        },
+      },
+    }),
+  );
 
   // Cookie parser — untuk baca HttpOnly refresh_token cookie
   app.use(cookieParser());
@@ -61,7 +73,7 @@ async function bootstrap() {
     apiReference({
       content: document,
     }),
-  )
+  );
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
