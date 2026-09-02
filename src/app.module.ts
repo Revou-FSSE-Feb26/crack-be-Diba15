@@ -1,4 +1,5 @@
 import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppealsModule } from './appeals/appeals.module';
 import { ArtworksModule } from './artworks/artworks.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
@@ -20,6 +21,13 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60 * 1000,
+        limit: 10,
+      },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,
