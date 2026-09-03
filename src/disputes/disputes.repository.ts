@@ -3,6 +3,7 @@ import type { DisputesRepositoryInterface } from '../common/interfaces/disputes.
 import type { DisputeStatus } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
+// Selector untuk mengambil data dispute beserta relasinya
 const disputeWithRelationsSelect = {
   include: {
     mediator: {
@@ -46,6 +47,10 @@ const disputeWithRelationsSelect = {
   },
 };
 
+/**
+ * Class Repository untuk handle logic data dispute
+ * Meng-implementasi dari interface DisputesRepositoryInterface
+ */
 @Injectable()
 export class DisputesRepository implements DisputesRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

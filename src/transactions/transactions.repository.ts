@@ -7,6 +7,7 @@ import type {
 } from '../common/interfaces/transactions.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+// Selector untuk mengambil data transaction beserta relasinya
 const transactionWithRelationsSelect = {
   include: {
     user: {
@@ -107,6 +108,10 @@ export class TransactionsRepository implements TransactionsRepositoryInterface {
     });
   }
 
+  /**
+   * Method untuk mengambil data financial summary
+   * @returns Promise<FinancialSummaryResult>
+   */
   async getFinancialSummary(): Promise<FinancialSummaryResult> {
     // 1. Ambil seluruh komisi platform untuk kalkulasi akurat GMV dan Escrow
     const commissions = await this.prisma.commission.findMany({

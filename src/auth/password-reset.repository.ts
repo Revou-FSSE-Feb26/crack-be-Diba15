@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import type { PasswordResetRepositoryInterface } from '../common/interfaces/password-reset.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data password reset
+ * Meng-implementasi dari interface PasswordResetRepositoryInterface
+ */
 @Injectable()
 export class PasswordResetRepository implements PasswordResetRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

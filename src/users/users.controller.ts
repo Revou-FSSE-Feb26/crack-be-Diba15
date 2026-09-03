@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
@@ -56,6 +57,7 @@ export class UsersController {
    * POST /api/users/withdraw
    * Tarik saldo / pencairan dana (khusus artist, min Rp 100.000).
    */
+  @Throttle({ default: { limit: 3, ttl: 60 * 1000 } })
   @Post('withdraw')
   @Roles('artist')
   @ApiOperation({ summary: 'Pencairan saldo ke rekening/e-wallet (Khusus Artist, min Rp 100.000)' })

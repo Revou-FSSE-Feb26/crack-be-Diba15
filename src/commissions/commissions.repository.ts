@@ -3,6 +3,7 @@ import type { CommissionsRepositoryInterface } from '../common/interfaces/commis
 import type { CommissionStatus, PaymentMethod } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
+// Selector untuk mengambil data komisi beserta relasinya
 const commissionWithRelationsSelect = {
   include: {
     artist: {

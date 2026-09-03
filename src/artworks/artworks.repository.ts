@@ -5,6 +5,7 @@ import type { CreateArtworkDto } from './dto/create-artwork.dto';
 import type { CurateArtworkDto } from './dto/curate-artwork.dto';
 import type { UpdateArtworkDto } from './dto/update-artwork.dto';
 
+// Selector yang digunakan untuk include data yang dibutuhkan dalam artwork
 const artworkWithRelationsSelect = {
   include: {
     artist: {
@@ -28,6 +29,10 @@ const artworkWithRelationsSelect = {
   },
 };
 
+/**
+ * Class Repository untuk handle logic data artworks
+ * Meng-implementasi dari interface ArtworksRepositoryInterface
+ */
 @Injectable()
 export class ArtworksRepository implements ArtworksRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

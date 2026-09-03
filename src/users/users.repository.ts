@@ -3,6 +3,10 @@ import type { UsersRepositoryInterface } from '../common/interfaces/users.reposi
 import type { Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data user
+ * Meng-implementasi dari interface UsersRepositoryInterface
+ */
 @Injectable()
 export class UsersRepository implements UsersRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

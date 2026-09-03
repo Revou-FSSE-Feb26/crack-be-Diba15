@@ -7,7 +7,7 @@
 
 ## 🌟 1. Gambaran Umum (*Overview*)
 
-**TruBrush Backend** adalah mesin API inti (*core server engine*) yang menangani seluruh proses bisnis kritis platform **TruBrush**. Arsitektur backend dibangun dengan standar perusahaan (*enterprise grade*) berbasis **NestJS**, **TypeScript**, dan **Prisma ORM**, menerapkan prinsip **SOLID, DRY, dan KISS**, pemisahan layer data terisolasi, serta kepatuhan *Role-Based Access Control (RBAC)*.
+**TruBrush Backend** adalah mesin API inti (*core server engine*) yang menangani seluruh proses bisnis kritis platform **TruBrush**. Berbasis **NestJS**, **TypeScript**, dan **Prisma ORM**, menerapkan prinsip **SOLID, DRY, dan KISS**, pemisahan layer data terisolasi, serta kepatuhan *Role-Based Access Control (RBAC)*.
 
 ---
 

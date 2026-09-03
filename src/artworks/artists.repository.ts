@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import type { ArtistsRepositoryInterface } from '../common/interfaces/artists.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data artists
+ * Meng-implementasi dari interface ArtistsRepositoryInterface
+ *
+ */
 @Injectable()
 export class ArtistsRepository implements ArtistsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

@@ -3,6 +3,7 @@ import type { ReportsRepositoryInterface } from '../common/interfaces/reports.re
 import type { ReportStatus, ReportTargetType } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
+// Selector untuk mengambil data report beserta relasinya
 const reportWithRelationsSelect = {
   include: {
     reporter: {
@@ -46,6 +47,10 @@ const reportWithRelationsSelect = {
   },
 };
 
+/**
+ * Class Repository untuk handle logic data report
+ * Meng-implementasi dari interface ReportsRepositoryInterface
+ */
 @Injectable()
 export class ReportsRepository implements ReportsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

@@ -6,6 +6,10 @@ import type {
 } from '../common/interfaces/audit-logs.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data audit logs
+ * Meng-implementasi dari interface AuditLogsRepositoryInterface
+ */
 @Injectable()
 export class AuditLogsRepository implements AuditLogsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
@@ -18,6 +22,7 @@ export class AuditLogsRepository implements AuditLogsRepositoryInterface {
     const shouldFetchDispute = category === 'all' || category === 'dispute';
     const shouldFetchAppeal = category === 'all' || category === 'appeal';
 
+    // Mengambil data dari keempat tabel sekaligus menggunakan Promise.all agar lebih efisien
     const [artworks, reports, disputes, appeals] = await Promise.all([
       shouldFetchCuration
         ? this.prisma.artwork.findMany({

@@ -101,6 +101,7 @@ export class AuthController {
   }
 
   // POST /api/auth/forgot-password
+  @Throttle({ default: { limit: 3, ttl: 60 * 1000 } })
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mengajukan permintaan reset password' })
@@ -110,6 +111,7 @@ export class AuthController {
   }
 
   // POST /api/auth/reset-password
+  @Throttle({ default: { limit: 3, ttl: 60 * 1000 } })
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password dengan token reset' })
