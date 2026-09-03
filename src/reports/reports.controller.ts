@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { GetCurrentUser } from '../auth/decorators/get-current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
@@ -16,6 +17,7 @@ import { ReportsService } from './reports.service';
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
+  @Throttle({ default: { limit: 3, ttl: 60 * 1000 } })
   @Post()
   @ApiOperation({ summary: 'Melaporkan artwork yang melanggar (AI-generated / plagiarisme)' })
   @ApiResponse({ status: 201, description: 'Laporan berhasil dibuat' })

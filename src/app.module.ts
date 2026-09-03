@@ -26,7 +26,7 @@ import { UsersModule } from './users/users.module';
       {
         name: 'default',
         ttl: 60 * 1000,
-        limit: 10,
+        limit: 100,
       },
     ]),
     PrismaModule,
