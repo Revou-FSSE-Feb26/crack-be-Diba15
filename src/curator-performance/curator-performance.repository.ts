@@ -6,6 +6,10 @@ import type {
 } from '../common/interfaces/curator-performance.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data curator performance
+ * Meng-implementasi dari interface CuratorPerformanceRepositoryInterface
+ */
 @Injectable()
 export class CuratorPerformanceRepository implements CuratorPerformanceRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

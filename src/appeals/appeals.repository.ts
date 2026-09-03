@@ -7,6 +7,7 @@ import type {
 } from '../common/interfaces/appeals.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+// Selector yang digunakan untuk include data yang dibutuhkan dalam appeals
 const appealWithRelationsSelect = {
   include: {
     artist: {
@@ -35,6 +36,10 @@ const appealWithRelationsSelect = {
   },
 };
 
+/**
+ * Class Repository untuk handle logic data appeals
+ * Meng-implementasi dari interface AppealsRepositoryInterface
+ */
 @Injectable()
 export class AppealsRepository implements AppealsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

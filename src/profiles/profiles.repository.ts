@@ -3,6 +3,10 @@ import type { ProfilesRepositoryInterface } from '../common/interfaces/profiles.
 import type { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data profile
+ * Meng-implementasi dari interface ProfilesRepositoryInterface
+ */
 @Injectable()
 export class ProfilesRepository implements ProfilesRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}

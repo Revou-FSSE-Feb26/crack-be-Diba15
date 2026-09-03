@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import type { TagsRepositoryInterface } from '../common/interfaces/tags.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Class Repository untuk handle logic data tags
+ * Meng-implementasi dari interface TagsRepositoryInterface
+ *
+ */
 @Injectable()
 export class TagsRepository implements TagsRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
