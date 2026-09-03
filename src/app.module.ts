@@ -1,5 +1,6 @@
 import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from '@nestjs/common';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppealsModule } from './appeals/appeals.module';
 import { ArtworksModule } from './artworks/artworks.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
@@ -44,6 +45,12 @@ import { UsersModule } from './users/users.module';
     AppealsModule,
     AuditLogsModule,
     CuratorPerformanceModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {
