@@ -1,15 +1,12 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { AppealsRepositoryInterface } from '../common/interfaces/appeals.repository.interface';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type { AppealStatus } from '../generated/prisma/enums';
+import { AppealsRepository } from './appeals.repository';
 import type { CreateAppealDto } from './dto/create-appeal.dto';
 import type { ResolveAppealDto } from './dto/resolve-appeal.dto';
 
 @Injectable()
 export class AppealsService {
-  constructor(
-    @Inject('IAppealsRepository')
-    private readonly appealsRepo: AppealsRepositoryInterface,
-  ) {}
+  constructor(private readonly appealsRepo: AppealsRepository) {}
 
   async create(artistId: string, dto: CreateAppealDto) {
     const trimmedReason = dto.reason.trim();

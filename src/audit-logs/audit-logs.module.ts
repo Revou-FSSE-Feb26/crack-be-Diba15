@@ -7,13 +7,7 @@ import { AuditLogsService } from './audit-logs.service';
 @Module({
   imports: [PrismaModule],
   controllers: [AuditLogsController],
-  providers: [
-    AuditLogsService,
-    {
-      provide: 'IAuditLogsRepository',
-      useClass: AuditLogsRepository,
-    },
-  ],
-  exports: [AuditLogsService, 'IAuditLogsRepository'],
+  providers: [AuditLogsService, AuditLogsRepository],
+  exports: [AuditLogsService, AuditLogsRepository],
 })
 export class AuditLogsModule {}

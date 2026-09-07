@@ -1,17 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  AuditLogFilterInput,
-  AuditLogItemResult,
-  AuditLogsRepositoryInterface,
-} from '../common/interfaces/audit-logs.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
+
+export type AuditLogCategory = 'curation' | 'report' | 'dispute' | 'appeal' | 'all';
+
+export interface AuditLogActor {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface AuditLogItemResult {
+  id: string;
+  category: 'curation' | 'report' | 'dispute' | 'appeal';
+  action: string;
+  actor: AuditLogActor;
+  targetType: string;
+  targetId: string;
+  targetTitle?: string | null;
+  details?: string | null;
+  status: string;
+  createdAt: Date;
+}
+
+export interface AuditLogFilterInput {
+  category?: AuditLogCategory;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
 
 /**
  * Class Repository untuk handle logic data audit logs
- * Meng-implementasi dari interface AuditLogsRepositoryInterface
  */
 @Injectable()
-export class AuditLogsRepository implements AuditLogsRepositoryInterface {
+export class AuditLogsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(filter: AuditLogFilterInput = {}) {

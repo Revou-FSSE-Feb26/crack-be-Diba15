@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { FavoriteRepositoryInterface } from '../common/interfaces/favorite.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
  * Class Repository untuk handle logic data favorite
- * Meng-implementasi dari interface FavoriteRepositoryInterface
  */
 @Injectable()
-export class FavoriteRepository implements FavoriteRepositoryInterface {
+export class FavoriteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findFavorite(userId: string, artworkId: string) {

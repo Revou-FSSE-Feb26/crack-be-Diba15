@@ -1,13 +1,10 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { TransactionsRepositoryInterface } from '../common/interfaces/transactions.repository.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { FilterTransactionDto } from './dto/filter-transaction.dto';
+import { TransactionsRepository } from './transactions.repository';
 
 @Injectable()
 export class TransactionsService {
-  constructor(
-    @Inject('ITransactionsRepository')
-    private readonly transactionsRepository: TransactionsRepositoryInterface,
-  ) {}
+  constructor(private readonly transactionsRepository: TransactionsRepository) {}
 
   private mapTransaction(tx: any) {
     if (!tx) return null;

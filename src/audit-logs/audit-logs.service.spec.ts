@@ -1,10 +1,10 @@
 import { Test, type TestingModule } from '@nestjs/testing';
-import type { AuditLogsRepositoryInterface } from '../common/interfaces/audit-logs.repository.interface';
+import { AuditLogsRepository } from './audit-logs.repository';
 import { AuditLogsService } from './audit-logs.service';
 
 describe('AuditLogsService', () => {
   let service: AuditLogsService;
-  let repository: jest.Mocked<AuditLogsRepositoryInterface>;
+  let repository: jest.Mocked<Partial<AuditLogsRepository>>;
 
   const mockAuditResult = {
     data: [
@@ -40,7 +40,7 @@ describe('AuditLogsService', () => {
       providers: [
         AuditLogsService,
         {
-          provide: 'IAuditLogsRepository',
+          provide: AuditLogsRepository,
           useValue: repository,
         },
       ],

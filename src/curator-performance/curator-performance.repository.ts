@@ -1,17 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  CuratorPerformanceFilter,
-  CuratorPerformanceRawData,
-  CuratorPerformanceRepositoryInterface,
-} from '../common/interfaces/curator-performance.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
+
+export interface CuratorPerformanceFilter {
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+}
+
+export interface CuratorRawUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  profile?: {
+    avatarUrl: string | null;
+    isVerified: boolean;
+  } | null;
+}
+
+export interface ReviewedArtworkRaw {
+  id: string;
+  title: string;
+  curationStatus: string;
+  reviewedBy: string | null;
+  reviewedAt: Date | null;
+  createdAt: Date;
+}
+
+export interface ResolvedDisputeRaw {
+  id: string;
+  mediatorId: string | null;
+  status: string;
+  createdAt: Date;
+}
+
+export interface ResolvedReportRaw {
+  id: string;
+  curatorId: string | null;
+  status: string;
+  createdAt: Date;
+}
+
+export interface CuratorPerformanceRawData {
+  curators: CuratorRawUser[];
+  artworks: ReviewedArtworkRaw[];
+  disputes: ResolvedDisputeRaw[];
+  reports: ResolvedReportRaw[];
+}
 
 /**
  * Class Repository untuk handle logic data curator performance
- * Meng-implementasi dari interface CuratorPerformanceRepositoryInterface
  */
 @Injectable()
-export class CuratorPerformanceRepository implements CuratorPerformanceRepositoryInterface {
+export class CuratorPerformanceRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getRawPerformanceData(

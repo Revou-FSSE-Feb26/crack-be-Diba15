@@ -1,11 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
-import type { TransactionsRepositoryInterface } from '../common/interfaces/transactions.repository.interface';
+import { TransactionsRepository } from './transactions.repository';
 import { TransactionsService } from './transactions.service';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
-  let repository: jest.Mocked<TransactionsRepositoryInterface>;
+  let repository: jest.Mocked<Partial<TransactionsRepository>>;
 
   const mockTransaction = {
     id: 'tx-001',
@@ -39,7 +39,7 @@ describe('TransactionsService', () => {
       providers: [
         TransactionsService,
         {
-          provide: 'ITransactionsRepository',
+          provide: TransactionsRepository,
           useValue: repository,
         },
       ],

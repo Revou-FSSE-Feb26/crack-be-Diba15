@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import type { ReportsRepositoryInterface } from '../common/interfaces/reports.repository.interface';
 import type { ReportStatus, ReportTargetType } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -49,10 +48,9 @@ const reportWithRelationsSelect = {
 
 /**
  * Class Repository untuk handle logic data report
- * Meng-implementasi dari interface ReportsRepositoryInterface
  */
 @Injectable()
-export class ReportsRepository implements ReportsRepositoryInterface {
+export class ReportsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createReport(

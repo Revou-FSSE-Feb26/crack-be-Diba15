@@ -1,11 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  AppealFilterInput,
-  AppealsRepositoryInterface,
-  CreateAppealInput,
-  ResolveAppealInput,
-} from '../common/interfaces/appeals.repository.interface';
+import type { AppealStatus } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
+
+export interface CreateAppealInput {
+  artistId: string;
+  reason: string;
+}
+
+export interface ResolveAppealInput {
+  status: AppealStatus;
+  resolvedById: string;
+  resolutionNotes?: string;
+}
+
+export interface AppealFilterInput {
+  status?: AppealStatus;
+  artistId?: string;
+  page?: number;
+  limit?: number;
+}
 
 // Selector yang digunakan untuk include data yang dibutuhkan dalam appeals
 const appealWithRelationsSelect = {
@@ -38,10 +51,9 @@ const appealWithRelationsSelect = {
 
 /**
  * Class Repository untuk handle logic data appeals
- * Meng-implementasi dari interface AppealsRepositoryInterface
  */
 @Injectable()
-export class AppealsRepository implements AppealsRepositoryInterface {
+export class AppealsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateAppealInput) {

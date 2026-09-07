@@ -36,7 +36,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // POST /api/auth/register
-  @Throttle({ default: { limit: 3, ttl: 60 * 1000 } })
+  @Throttle({ default: { limit: 10, ttl: 60 * 1000 } })
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Mendaftar akun baru' })
@@ -53,7 +53,7 @@ export class AuthController {
   }
 
   // POST /api/auth/login
-  @Throttle({ default: { limit: 3, ttl: 60 * 1000 } })
+  @Throttle({ default: { limit: 10, ttl: 60 * 1000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login ke sistem' })

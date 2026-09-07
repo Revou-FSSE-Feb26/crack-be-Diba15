@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import type { DisputesRepositoryInterface } from '../common/interfaces/disputes.repository.interface';
 import type { DisputeStatus } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -49,10 +48,9 @@ const disputeWithRelationsSelect = {
 
 /**
  * Class Repository untuk handle logic data dispute
- * Meng-implementasi dari interface DisputesRepositoryInterface
  */
 @Injectable()
-export class DisputesRepository implements DisputesRepositoryInterface {
+export class DisputesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createDispute(commissionId: string, reason: string) {
