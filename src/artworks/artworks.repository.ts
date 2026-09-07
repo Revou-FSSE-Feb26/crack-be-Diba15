@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import type { ArtworksRepositoryInterface } from '../common/interfaces/artworks.repository.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateArtworkDto } from './dto/create-artwork.dto';
 import type { CurateArtworkDto } from './dto/curate-artwork.dto';
@@ -34,7 +33,7 @@ const artworkWithRelationsSelect = {
  * Meng-implementasi dari interface ArtworksRepositoryInterface
  */
 @Injectable()
-export class ArtworksRepository implements ArtworksRepositoryInterface {
+export class ArtworksRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findProfileByUserId(userId: string) {

@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import type { UsersRepositoryInterface } from '../common/interfaces/users.repository.interface';
 import type { Prisma, Role } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
  * Class Repository untuk handle logic data user
- * Meng-implementasi dari interface UsersRepositoryInterface
  */
 @Injectable()
-export class UsersRepository implements UsersRepositoryInterface {
+export class UsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string) {

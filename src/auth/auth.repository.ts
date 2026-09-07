@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import type { AuthRepositoryInterface } from '../common/interfaces/auth.repository.interface';
 import type { Role, User } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
  * Class Repository untuk handle logic data auth
- * Meng-implementasi dari interface AuthRepositoryInterface
  */
 @Injectable()
-export class AuthRepository implements AuthRepositoryInterface {
+export class AuthRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(email: string): Promise<User | null> {

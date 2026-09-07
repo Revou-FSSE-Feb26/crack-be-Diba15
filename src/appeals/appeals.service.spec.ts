@@ -1,12 +1,12 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
-import type { AppealsRepositoryInterface } from '../common/interfaces/appeals.repository.interface';
 import { AppealStatus } from '../generated/prisma/enums';
+import { AppealsRepository } from './appeals.repository';
 import { AppealsService } from './appeals.service';
 
 describe('AppealsService', () => {
   let service: AppealsService;
-  let appealsRepository: jest.Mocked<AppealsRepositoryInterface>;
+  let appealsRepository: jest.Mocked<Partial<AppealsRepository>>;
 
   const mockAppeal = {
     id: 'app-001',
@@ -47,7 +47,7 @@ describe('AppealsService', () => {
       providers: [
         AppealsService,
         {
-          provide: 'IAppealsRepository',
+          provide: AppealsRepository,
           useValue: appealsRepository,
         },
       ],

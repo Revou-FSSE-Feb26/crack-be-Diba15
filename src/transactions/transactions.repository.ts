@@ -1,11 +1,33 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  CreateTransactionInput,
-  FinancialSummaryResult,
-  TransactionFilterInput,
-  TransactionsRepositoryInterface,
-} from '../common/interfaces/transactions.repository.interface';
+import type { TransactionStatus, TransactionType } from '../generated/prisma/enums';
 import { PrismaService } from '../prisma/prisma.service';
+
+export interface CreateTransactionInput {
+  userId: string;
+  type: TransactionType;
+  amount: number;
+  title: string;
+  status?: TransactionStatus;
+  commissionId?: string;
+  metadata?: any;
+}
+
+export interface TransactionFilterInput {
+  userId?: string;
+  type?: TransactionType;
+  startDate?: Date | string;
+  endDate?: Date | string;
+  page?: number;
+  limit?: number;
+}
+
+export interface FinancialSummaryResult {
+  totalGmv: number;
+  escrowBalance: number;
+  platformFeeRevenue: number;
+  totalWithdrawals: number;
+  activeCommissionsCount: number;
+}
 
 // Selector untuk mengambil data transaction beserta relasinya
 const transactionWithRelationsSelect = {
@@ -30,7 +52,7 @@ const transactionWithRelationsSelect = {
 };
 
 @Injectable()
-export class TransactionsRepository implements TransactionsRepositoryInterface {
+export class TransactionsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createTransaction(data: CreateTransactionInput) {

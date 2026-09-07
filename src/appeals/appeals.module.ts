@@ -7,13 +7,7 @@ import { AppealsService } from './appeals.service';
 @Module({
   imports: [PrismaModule],
   controllers: [AppealsController],
-  providers: [
-    AppealsService,
-    {
-      provide: 'IAppealsRepository',
-      useClass: AppealsRepository,
-    },
-  ],
-  exports: [AppealsService, 'IAppealsRepository'],
+  providers: [AppealsService, AppealsRepository],
+  exports: [AppealsService, AppealsRepository],
 })
 export class AppealsModule {}
