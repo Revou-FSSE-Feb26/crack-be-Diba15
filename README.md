@@ -91,6 +91,7 @@ $$\text{Approval Rate} = \left(\frac{\text{Approved Artworks}}{\text{Total Revie
 ```
 crack-be-diba15/
 ├── docs/                               # Dokumentasi Teknis & Bisnis
+│   ├── API-REFERENCES.md               # Dokumentasi Lengkap REST Endpoints
 │   ├── BUSINESS_PROCESS.md             # Alur Proses Bisnis End-to-End
 │   ├── LOGIC_DOCS.md                   # Logika Bisnis & Formula Perhitungan
 │   ├── REPORT_YAGNI.md                 # Laporan Audit & Solusi Prinsip YAGNI
@@ -182,6 +183,7 @@ pnpm run build
 
 ## 📖 9. Referensi Dokumentasi Tambahan
 
+- 📚 [**Dokumentasi Lengkap REST API Endpoints (API-REFERENCES.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/API-REFERENCES.md)
 - 📄 [**Alur Bisnis & Matriks RBAC (BUSINESS_PROCESS.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/BUSINESS_PROCESS.md)
 - 📐 [**Dokumentasi Logika & Formula Bisnis (LOGIC_DOCS.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/LOGIC_DOCS.md)
 - 📑 [**Laporan Audit & Solusi Prinsip YAGNI (REPORT_YAGNI.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/REPORT_YAGNI.md)
