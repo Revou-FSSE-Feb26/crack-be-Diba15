@@ -10,6 +10,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { MaintenanceCheckMiddleware } from './common/middleware/maintenance-check.middleware';
 import { CuratorPerformanceModule } from './curator-performance/curator-performance.module';
 import { DisputesModule } from './disputes/disputes.module';
+import { HealthModule } from './health/health.module';
 import { MailModule } from './mail/mail.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfilesModule } from './profiles/profiles.module';
@@ -45,6 +46,7 @@ import { UsersModule } from './users/users.module';
     AppealsModule,
     AuditLogsModule,
     CuratorPerformanceModule,
+    HealthModule,
   ],
   providers: [
     {
