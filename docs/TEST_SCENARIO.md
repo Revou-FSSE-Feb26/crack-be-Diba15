@@ -140,7 +140,7 @@ Seluruh pengujian API di bawah ini dapat dijalankan secara otomatis melalui Post
 
 ---
 
-## 🧪 2. Matriks Pengujian Unit Test NestJS (25 Test Suites, 173 Tests)
+## 🧪 2. Matriks Pengujian Unit Test NestJS (27 Test Suites, 178 Tests)
 
 Backend TruBrush dilengkapi pengujian unit test menyeluruh (`.spec.ts`) pada setiap layer *Controller* dan *Service*:
 
@@ -163,6 +163,6 @@ pnpm test
 11. `social.controller.spec.ts` & `social.service.spec.ts` (Follow/Unfollow Toggle, Favorite Toggle)
 12. `profiles.controller.spec.ts` & `profiles.service.spec.ts` (Profile & Bio Updates)
 13. `upload.controller.spec.ts` & `upload.service.spec.ts` (Single & Multi-file Upload Validation)
-14. `app.controller.spec.ts` & `app.service.spec.ts` (Healthcheck & Root Routing)
+14. `health.controller.spec.ts` & `health.service.spec.ts` (Database Healthcheck Probe & Repository Pattern)
 
-**Status Hasil:** **100% Passed (25/25 Suites, 173/173 Tests, 0 Failed)**.
+**Status Hasil:** **100% Passed (27/27 Suites, 178/178 Tests, 0 Failed)**.

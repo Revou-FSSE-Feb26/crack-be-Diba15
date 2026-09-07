@@ -19,7 +19,7 @@ Backend TruBrush mengimplementasikan pola aliran data 4-lapisan (*4-Tier Layered
 graph LR
     Client[HTTP Client / BFF] --> Controller[1. Controller Layer]
     Controller --> Service[2. Service Layer / Business Engine]
-    Service --> Repo[3. Repository Layer / Abstraction Interface]
+    Service --> Repo[3. Repository Layer / Concrete Class]
     Repo --> Prisma[4. Prisma ORM & PostgreSQL DB]
 ```
 
@@ -27,7 +27,7 @@ graph LR
 1. **Single Responsibility & Data Layer Isolation:**
    - `Controller`: Hanya menangani *routing*, serialisasi request/response, dan validasi DTO Swagger.
    - `Service`: Murni memproses aturan bisnis, validasi logika, dan formula matematika.
-   - `Repository`: Mengenkapsulasi query database Prisma di balik antarmuka (*Interface*) kontrak.
+   - `Repository`: Mengenkapsulasi query basis data Prisma dan isolasi akses data (injeksi kelas konkret repository).
 2. **Auth Module Isolation:**
    - `AuthModule` memiliki `AuthRepository` independen dan tidak menginjeksi `UsersService` secara langsung guna menghindari dependensi sirkular.
 3. **Role-Based Access Control (RBAC):**
@@ -91,15 +91,17 @@ $$\text{Approval Rate} = \left(\frac{\text{Approved Artworks}}{\text{Total Revie
 ```
 crack-be-diba15/
 ├── docs/                               # Dokumentasi Teknis & Bisnis
+│   ├── API-REFERENCES.md               # Dokumentasi Lengkap REST Endpoints
 │   ├── BUSINESS_PROCESS.md             # Alur Proses Bisnis End-to-End
-│   └── LOGIC_DOCS.md                   # Logika Bisnis & Formula Perhitungan
+│   ├── LOGIC_DOCS.md                   # Logika Bisnis & Formula Perhitungan
+│   ├── REPORT_YAGNI.md                 # Laporan Audit & Solusi Prinsip YAGNI
+│   └── TEST_SCENARIO.md                # Naskah Skenario Pengujian API
 ├── prisma/
 │   ├── schema.prisma                   # Skema Model Database Prisma
 │   └── seed.ts                         # Data Awal / Seeding Database (2026 Timestamps)
 ├── src/
-│   ├── common/                         # Antarmuka, Guards, Interceptors, & Middlewares
+│   ├── common/                         # Guards, Interceptors, & Middlewares
 │   │   ├── guards/                     # RolesGuard, JwtAuthGuard
-│   │   ├── interfaces/                 # Repository Interfaces Kontrak (DIP)
 │   │   └── middlewares/                # HttpLoggerMiddleware, MaintenanceMiddleware
 │   ├── auth/                           # Modul Otentikasi & AuthRepository
 │   ├── artworks/                       # Modul Karya Seni, Kurasi, & Tags
@@ -110,6 +112,7 @@ crack-be-diba15/
 │   ├── transactions/                   # Modul Laporan Finansial & Wallet Transaction
 │   ├── curator-performance/            # Modul Evaluasi SLA & Kinerja Kurator
 │   ├── audit-logs/                     # Modul Log Audit Kronologis
+│   ├── health/                         # Modul Health Check Probe & Repository Pattern
 │   ├── app.module.ts                   # Modul Utama Aplikasi
 │   └── main.ts                         # Entry Point Server & Swagger Setup
 ├── biome.json                          # Konfigurasi Linter Biome
@@ -169,7 +172,7 @@ Backend TruBrush memiliki cakupan pengujian unit ketat untuk setiap *Service* da
 # 1. Pengecekan Linting & Formatting dengan Biome (0 Error)
 pnpm biome check
 
-# 2. Menjalankan Seluruh Unit Test (100% Lulus: 25 Test Suites, 173 Tests)
+# 2. Menjalankan Seluruh Unit Test (100% Lulus: 27 Test Suites, 178 Tests)
 pnpm test
 
 # 3. Kompilasi Produksi NestJS (Exit Code 0)
@@ -180,7 +183,9 @@ pnpm run build
 
 ## 📖 9. Referensi Dokumentasi Tambahan
 
+- 📚 [**Dokumentasi Lengkap REST API Endpoints (API-REFERENCES.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/API-REFERENCES.md)
 - 📄 [**Alur Bisnis & Matriks RBAC (BUSINESS_PROCESS.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/BUSINESS_PROCESS.md)
 - 📐 [**Dokumentasi Logika & Formula Bisnis (LOGIC_DOCS.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/LOGIC_DOCS.md)
+- 📑 [**Laporan Audit & Solusi Prinsip YAGNI (REPORT_YAGNI.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/REPORT_YAGNI.md)
 - 🧪 [**Naskah Skenario Pengujian Manual (TEST_SCENARIO.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/TEST_SCENARIO.md)
 - 📮 [**Panduan & Koleksi Postman API (docs/postman/README.md)**](file:///d:/Revou/Assignment/crack_project/crack-be-diba15/docs/postman/README.md)
