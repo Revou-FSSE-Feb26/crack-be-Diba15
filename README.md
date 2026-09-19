@@ -1,3 +1,5 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/EdN1T4tj)
+
 # TruBrush Backend
 
 REST API untuk platform TruBrush, yaitu portofolio seni digital dan pemesanan komisi berbasis escrow yang hanya menerima karya buatan manusia. Backend ini menangani autentikasi, kurasi karya, siklus komisi dan pembayaran escrow, sengketa, laporan, banding akun, serta pencatatan transaksi.
@@ -6,12 +8,13 @@ Dibangun dengan NestJS, TypeScript, dan Prisma ORM di atas PostgreSQL. Akses dib
 
 ## Demo
 
-| Layanan             | URL                                                 |
-| ------------------- | --------------------------------------------------- |
-| Backend (API)       | https://trubrush-be.up.railway.app/                 |
-| Frontend            | https://trubrush.vercel.app                         |
-| Repositori backend  | https://github.com/Revou-FSSE-Feb26/crack-be-Diba15 |
-| Repositori frontend | https://github.com/Revou-FSSE-Feb26/crack-fe-Diba15 |
+| Layanan             | URL                                                   |
+| ------------------- | ----------------------------------------------------- |
+| Backend (API)       | <https://trubrush-be.up.railway.app/api>                 |
+| Backend (DOCS)       | <https://trubrush-be.up.railway.app/docs>                 |
+| Frontend            | <https://trubrush.vercel.app>                         |
+| Repositori backend  | <https://github.com/Revou-FSSE-Feb26/crack-be-Diba15> |
+| Repositori frontend | <https://github.com/Revou-FSSE-Feb26/crack-fe-Diba15> |
 
 ## Daftar Isi
 
@@ -95,6 +98,7 @@ Penjelasan lebih rinci ada di [docs/LOGIC_DOCS.md](docs/LOGIC_DOCS.md).
 
 ```
 crack-be-Diba15/
+├── .github/workflows/      # Workflow GitHub Actions
 ├── docs/                   # Dokumentasi teknis dan bisnis
 │   ├── postman/            # Koleksi Postman
 │   ├── API-REFERENCES.md
@@ -121,9 +125,13 @@ crack-be-Diba15/
 │   ├── audit-logs/         # Log audit
 │   ├── health/             # Health check
 │   ├── app.module.ts       # Modul utama
-│   └── main.ts             # Entry point dan setup Swagger
+│   └── main.ts             # Entry point dan setup dokumentasi API
+├── test/                   # Test end-to-end
+├── .env.example            # Contoh konfigurasi environment
 ├── biome.json
+├── nest-cli.json
 ├── package.json
+├── prisma.config.ts
 └── tsconfig.json
 ```
 
@@ -142,18 +150,20 @@ crack-be-Diba15/
    pnpm install
    ```
 
-2. Buat berkas `.env` di root proyek:
+2. Salin contoh konfigurasi, lalu isi nilainya:
 
-   ```env
-   DATABASE_URL="postgresql://postgres:[PASSWORD]@[HOST]:[PORT]/postgres?schema=public"
-   DIRECT_URL="postgresql://postgres:[PASSWORD]@[HOST]:[PORT]/postgres?schema=public"
-   JWT_ACCESS_SECRET="your-access-secret-key"
-   JWT_REFRESH_SECRET="your-refresh-secret-key"
-   PORT=3001
-   NODE_ENV=development
+   ```bash
+   cp .env.example .env
    ```
 
-   Ganti nilai `[PASSWORD]`, `[HOST]`, dan `[PORT]` dengan kredensial database, dan isi kedua secret JWT dengan string acak.
+   | Variabel             | Keterangan                                                 |
+   | -------------------- | ---------------------------------------------------------- |
+   | `DATABASE_URL`       | Connection string PostgreSQL yang dipakai aplikasi         |
+   | `DIRECT_URL`         | Koneksi langsung ke database, dipakai Prisma untuk migrasi |
+   | `JWT_ACCESS_SECRET`  | Secret untuk access token (isi dengan string acak)         |
+   | `JWT_REFRESH_SECRET` | Secret untuk refresh token (isi dengan string acak)        |
+   | `PORT`               | Port server (default `3001`)                               |
+   | `NODE_ENV`           | Mode aplikasi, misalnya `development`                      |
 
 3. Jalankan migrasi dan seed database:
 
@@ -168,7 +178,7 @@ crack-be-Diba15/
    pnpm run start:dev
    ```
 
-   Server berjalan di <http://localhost:3001>. Dokumentasi Swagger tersedia di <http://localhost:3001/docs>.
+   Server berjalan di <http://localhost:3001>. Dokumentasi API interaktif tersedia di <http://localhost:3001/docs>.
 
 ## Skrip yang Tersedia
 
